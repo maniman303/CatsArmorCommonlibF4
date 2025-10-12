@@ -5,8 +5,8 @@ set_xmakever("2.8.2")
 includes("lib/commonlibf4")
 
 -- set project
-set_project("commonlibf4-template")
-set_version("0.0.0")
+set_project("ScatArmorPlugin")
+set_version("1.0.0")
 set_license("GPL-3.0")
 
 -- set defaults
@@ -21,15 +21,15 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- targets
-target("commonlibf4-template")
+target("ScatArmorPlugin")
     -- add dependencies to target
     add_deps("commonlibf4")
 
     -- add commonlibsse plugin
     add_rules("commonlibf4.plugin", {
-        name = "commonlibf4-template",
-        author = "qudix",
-        description = "F4SE plugin template using CommonLibF4"
+        name = "ScatArmorPlugin",
+        author = "maniman303",
+        description = "F4SE plugin for Scat armor"
     })
 
     -- add src files
