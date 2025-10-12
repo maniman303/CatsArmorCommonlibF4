@@ -9,13 +9,13 @@ This is a basic plugin template using CommonLibF4.
 ## Getting Started
 ```bat
 git clone --recurse-submodules https://github.com/maniman303/ScatArmorCommonlibF4.git
-cd commonlibf4-template
+cd ScatArmorCommonlibF4
 ```
 
 ### Build
 To build the project, run the following command:
 ```bat
-xmake build
+xmake build -y
 ```
 
 > ***Note:*** *This will generate a `build/windows/` directory in the **project's root directory** with the build output.*
@@ -41,6 +41,3 @@ If you want to upgrade the project's dependencies, run the following commands:
 xmake repo --update
 xmake require --upgrade
 ```
-
-## Documentation
-Please refer to the [Wiki](../../wiki/Home) for more advanced topics.
