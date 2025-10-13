@@ -132,7 +132,8 @@ namespace HeadgearProcessor
 
 		armor->AddKeyword(setup.keyword);
 
-		Workaround::AddAttachKeyword(armor, setup.attachSlot);
+		//Workaround::AddAttachKeyword(armor, setup.attachSlot);
+		armor->attachParents.AddKeyword(setup.attachSlot);
 
 		TrySetBaseIndex(armor);
 

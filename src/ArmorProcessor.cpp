@@ -49,8 +49,8 @@ namespace ArmorProcessor
 
 		//REX::INFO(std::format("Adding attach keyword {0}.", attachSlot->GetFormID()));
 
-		Workaround::AddAttachKeyword(armor, attachSlot);
-		//armor->attachParents.AddKeyword(attachSlot);
+		//Workaround::AddAttachKeyword(armor, attachSlot);
+		armor->attachParents.AddKeyword(attachSlot);
 
 		//REX::INFO(std::format("Setting up armor addon {0}.", addon->GetFormID()));
 
