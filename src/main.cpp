@@ -30,6 +30,11 @@ bool InitModCore(const F4SE::QueryInterface* a_f4se)
 
 void OnMessage(F4SE::MessagingInterface::Message* message)
 {
+	if (message-> type == F4SE::MessagingInterface::kPostLoad)
+	{
+		Hooks::Install();
+	}
+
 	if (message->type == F4SE::MessagingInterface::kGameDataReady)
 	{
 		if (!Files::VerifyPaths())
@@ -70,6 +75,7 @@ bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
 F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 {
 	F4SE::Init(a_f4se, F4SE::InitInfo());
+	F4SE::AllocTrampoline(20);
 
 	InitModCore(a_f4se);
 

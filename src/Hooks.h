@@ -4,32 +4,50 @@
 
 namespace Hooks
 {
-	/*struct HookActorEquipManager
+	struct InitLoadGame
 	{
-		static bool EquipObject(
-			RE::ActorEquipManager* a_self,
-			RE::Actor* a_actor,
-			const RE::BGSObjectInstance& a_object,
-			std::uint32_t a_stackID,
-			std::uint32_t a_number,
-			const RE::BGSEquipSlot* a_slot,
-			bool a_queueEquip,
-			bool a_forceEquip,
-			bool a_playSounds,
-			bool a_applyNow,
-			bool a_locked);
+		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
 
-		static inline REL::Hook EquipObjectHook01{ REL::ID(2231392), 0xB8, EquipObject };
-		static inline REL::Hook EquipObjectHook02{ REL::ID(2231392), 0x9D, EquipObject };
-		static inline REL::Hook EquipObjectHook03{ REL::ID(2231392), 0x358, EquipObject };
+		static inline REL::Relocation<decltype(thunk)> func;
+		static inline constexpr std::size_t idx{ 0x13 };
 	};
 
-	struct HookAIProcess
+	struct ShouldBackgroundClone
 	{
-		static void SetEquippedItem(
-			RE::AIProcess* a_self,
-			RE::Actor* a_actor,
-			const RE::BGSObjectInstance& a_instance,
-			const RE::BGSEquipSlot* a_slot);
-	};*/
+		static bool thunk(RE::Actor* aThis);
+
+		static inline REL::Relocation<decltype(thunk)> func;
+		static inline constexpr std::size_t idx{ 0x89 };
+	};
+
+	struct Revert
+	{
+		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
+
+		static inline REL::Relocation<decltype(thunk)> func;
+		static inline size_t idx{ 0x15 };
+	};
+
+	struct LoadGame
+	{
+		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
+
+		static inline REL::Relocation<decltype(thunk)> func;
+		static inline size_t idx{ 0x12 };
+	};
+
+	void Install();
+
+	template <class F, size_t index, class T>
+	void WriteVFunc()
+	{
+		REL::Relocation<std::uintptr_t> vtbl{ F::VTABLE[index] };
+		T::func = vtbl.write_vfunc(T::idx, T::thunk);
+	}
+
+	template <class F, class T>
+	void WriteVFunc()
+	{
+		WriteVFunc<F, 0, T>();
+	}
 }
