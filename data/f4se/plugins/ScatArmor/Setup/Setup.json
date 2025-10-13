@@ -1,0 +1,37 @@
+{
+	"torso": {
+		"keywordToAdd": "Scat Armor.esl|E",
+		"attachSlotToAdd": "Scat Armor.esl|1A",
+		"armorAddon": "Scat Armor.esl|6"
+	},
+	"leftArm": {
+		"keywordToAdd": "Scat Armor.esl|F",
+		"attachSlotToAdd": "Scat Armor.esl|1B",
+		"armorAddon": "Scat Armor.esl|2"
+	},
+	"rightArm": {
+		"keywordToAdd": "Scat Armor.esl|10",
+		"attachSlotToAdd": "Scat Armor.esl|1C",
+		"armorAddon": "Scat Armor.esl|3"
+	},
+	"leftLeg": {
+		"keywordToAdd": "Scat Armor.esl|11",
+		"attachSlotToAdd": "Scat Armor.esl|1D",
+		"armorAddon": "Scat Armor.esl|4"
+	},
+	"rightLeg": {
+		"keywordToAdd": "Scat Armor.esl|12",
+		"attachSlotToAdd": "Scat Armor.esl|1E",
+		"armorAddon": "Scat Armor.esl|5"
+	},
+	"headgear": {
+		"enabled": true,
+		"keywordToAdd": "Scat Armor.esl|13",
+		"attachSlotToAdd": "Scat Armor.esl|1F",
+		"armorAddon": "Scat Armor.esl|7",
+		"keywordHairLong": "Scat Armor.esl|21",
+		"keywordHairTop": "Scat Armor.esl|20",
+		"keywordHairBeard": "Scat Armor.esl|22",
+	},
+	"workaround": "Scat Armor.esl|1"
+}
