@@ -20,6 +20,9 @@ set_policy("package.requires_lock", true)
 add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
+-- add requires
+add_requires("jsoncpp")
+
 -- targets
 target("ScatArmorPlugin")
     -- add dependencies to target
@@ -37,3 +40,4 @@ target("ScatArmorPlugin")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+    add_packages("jsoncpp")

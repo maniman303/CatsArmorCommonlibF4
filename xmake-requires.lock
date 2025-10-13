@@ -11,6 +11,14 @@
             },
             version = "4.0.3"
         },
+        ["jsoncpp#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "8eddbca29fba3ca85e2f09b4d10465fb12cebdd0",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "1.9.6"
+        },
         ["ninja#f56260b5"] = {
             repo = {
                 branch = "master",

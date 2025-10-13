@@ -1,0 +1,259 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include "Setup.h"
+#include "Files.h"
+#include "FormUtil.h"
+
+namespace Setup
+{
+	std::map<int, uint16_t> WorkaroundMap;
+
+	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword)
+	{
+		if (keyword == NULL) {
+			return 0;
+		}
+
+		int formId = keyword->GetFormID();
+
+		if (WorkaroundMap.contains(formId)) {
+			return WorkaroundMap[formId];
+		}
+
+		return 0;
+	}
+
+	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa, RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb)
+	{
+		keyword = kw;
+		attachSlot = as;
+		armorAddon = aa;
+		isEmpty = false;
+		isEnabled = true;
+		bipedIndex = 58,
+		keywordHairLong = kwHl;
+		keywordHairTop = kwHt;
+		keywordHairBeard = kwHb;
+	}
+
+	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa)
+	{
+		keyword = kw;
+		attachSlot = as;
+		armorAddon = aa;
+		isEmpty = false;
+		isEnabled = true;
+		bipedIndex = 58;
+		keywordHairLong = NULL;
+		keywordHairTop = NULL;
+		keywordHairBeard = NULL;
+	}
+
+	TypedSetup::TypedSetup()
+	{
+		keyword = NULL;
+		attachSlot = NULL;
+		armorAddon = NULL;
+		isEmpty = true;
+		isEnabled = false;
+		bipedIndex = 58;
+		keywordHairLong = NULL;
+		keywordHairTop = NULL;
+		keywordHairBeard = NULL;
+	}
+
+	std::map<std::string, TypedSetup> SetupMap;
+
+	TypedSetup GetForms(std::string type)
+	{
+		for (auto& it : SetupMap) {
+			if (it.first.compare(type) == 0) {
+				return it.second;
+			}
+		}
+
+		return TypedSetup();
+	}
+
+	bool LoadTypedSetup(Json::Value setup, std::string type)
+	{
+		auto typedSetup = setup[type];
+
+		if (typedSetup.empty()) {
+			return false;
+		}
+
+		auto keyword = FormUtil::GetFormFromJson(typedSetup["keywordToAdd"], RE::ENUM_FORM_ID::kKYWD);
+		if (keyword == NULL || keyword->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto attachSlot = FormUtil::GetFormFromJson(typedSetup["attachSlotToAdd"], RE::ENUM_FORM_ID::kKYWD);
+		if (attachSlot == NULL || attachSlot->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto armorAddon = FormUtil::GetFormFromJson(typedSetup["armorAddon"], RE::ENUM_FORM_ID::kARMA);
+		if (armorAddon == NULL || armorAddon->GetFormType() != RE::ENUM_FORM_ID::kARMA) {
+			return false;
+		}
+
+		SetupMap[type] = TypedSetup(keyword->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>());
+
+		return true;
+	}
+
+	bool LoadHeadgearSetup(Json::Value setup)
+	{
+		auto typedSetup = setup["headgear"];
+
+		if (typedSetup.empty()) {
+			REX::WARN("Json setup is empty.");
+			return false;
+		}
+
+		if (typedSetup["enabled"].empty() || !typedSetup["enabled"].isBool() || !typedSetup["enabled"].asBool()) {
+			REX::WARN("Json setup is disabled.");
+			return false;
+		}
+
+		auto keyword = FormUtil::GetFormFromJson(typedSetup["keywordToAdd"], RE::ENUM_FORM_ID::kKYWD);
+		if (keyword == NULL || keyword->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto attachSlot = FormUtil::GetFormFromJson(typedSetup["attachSlotToAdd"], RE::ENUM_FORM_ID::kKYWD);
+		if (attachSlot == NULL || attachSlot->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto armorAddon = FormUtil::GetFormFromJson(typedSetup["armorAddon"], RE::ENUM_FORM_ID::kARMA);
+		if (armorAddon == NULL || armorAddon->GetFormType() != RE::ENUM_FORM_ID::kARMA) {
+			return false;
+		}
+
+		auto keywordHairLong = FormUtil::GetFormFromJson(typedSetup["keywordHairLong"], RE::ENUM_FORM_ID::kKYWD);
+		if (keywordHairLong == NULL || keywordHairLong->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto keywordHairTop = FormUtil::GetFormFromJson(typedSetup["keywordHairTop"], RE::ENUM_FORM_ID::kKYWD);
+		if (keywordHairTop == NULL || keywordHairTop->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		auto keywordHairBeard = FormUtil::GetFormFromJson(typedSetup["keywordHairBeard"], RE::ENUM_FORM_ID::kKYWD);
+		if (keywordHairBeard == NULL || keywordHairBeard->GetFormType() != RE::ENUM_FORM_ID::kKYWD) {
+			return false;
+		}
+
+		SetupMap["headgear"] = TypedSetup(keyword->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>(),
+			keywordHairLong->As<RE::BGSKeyword>(), keywordHairTop->As<RE::BGSKeyword>(), keywordHairBeard->As<RE::BGSKeyword>());
+
+		return true;
+	}
+
+	void LoadWorkaround(Json::Value setup)
+	{
+		auto workaroundSetup = setup["workaround"];
+
+		if (workaroundSetup.empty()) {
+			REX::WARN("Workaround setup is missing.");
+			return;
+		}
+
+		auto armor = FormUtil::GetFormFromJson(workaroundSetup, RE::ENUM_FORM_ID::kARMO);
+
+		if (armor == NULL) {
+			REX::WARN("Workaround setup has invalid item.");
+			return;
+		}
+
+		auto form = armor->As<RE::TESObjectARMO>();
+
+		if (form->attachParents.size != 6) {
+			REX::WARN("Workaround armor has invalid amount of attach parent slots.");
+			return;
+		}
+
+		auto torsoKeyword = SetupMap["torso"].attachSlot->GetFormID();
+		auto leftArmKeyword = SetupMap["leftArm"].attachSlot->GetFormID();
+		auto rightArmKeyword = SetupMap["rightArm"].attachSlot->GetFormID();
+		auto leftLegKeyword = SetupMap["leftLeg"].attachSlot->GetFormID();
+		auto rightLegKeyword = SetupMap["rightLeg"].attachSlot->GetFormID();
+
+		WorkaroundMap[torsoKeyword] = form->attachParents.array[0].keywordIndex;
+		WorkaroundMap[leftArmKeyword] = form->attachParents.array[1].keywordIndex;
+		WorkaroundMap[rightArmKeyword] = form->attachParents.array[2].keywordIndex;
+		WorkaroundMap[leftLegKeyword] = form->attachParents.array[3].keywordIndex;
+		WorkaroundMap[rightLegKeyword] = form->attachParents.array[4].keywordIndex;
+
+		if (SetupMap.contains("headgear") && SetupMap["headgear"].attachSlot != NULL) {
+			WorkaroundMap[SetupMap["headgear"].attachSlot->GetFormID()] = form->attachParents.array[5].keywordIndex;
+		}
+
+		REX::INFO("Workaround loaded successfully.");
+	}
+
+	bool Initialize()
+	{
+		auto path = Files::GetPluginPath().append("Setup");
+		auto filePath = path.append("Setup.json");
+
+		if (!std::filesystem::exists(filePath)) {
+			REX::INFO("Missing Setup.json file.");
+			return false;
+		}
+
+		Json::Value setupJson;
+		std::ifstream setupFile;
+
+		try {
+			setupFile.open(filePath);
+
+			setupFile >> setupJson;
+
+			setupFile.close();
+		} catch (std::exception ex) {
+			REX::ERROR(std::format("Invalid json '{0}'.", filePath.string()));
+
+			return false;
+		}
+
+		bool result = true;
+
+		if (!LoadTypedSetup(setupJson, "torso")) {
+			REX::WARN("Missing setup for torso.");
+			result = false;
+		}
+
+		if (!LoadTypedSetup(setupJson, "leftArm")) {
+			REX::WARN("Missing setup for left arm.");
+			result = false;
+		}
+
+		if (!LoadTypedSetup(setupJson, "rightArm")) {
+			REX::WARN("Missing setup for right arm.");
+			result = false;
+		}
+
+		if (!LoadTypedSetup(setupJson, "leftLeg")) {
+			REX::WARN("Missing setup for left leg.");
+			result = false;
+		}
+
+		if (!LoadTypedSetup(setupJson, "rightLeg")) {
+			REX::WARN("Missing setup for right leg.");
+			result = false;
+		}
+
+		if (!LoadHeadgearSetup(setupJson)) {
+			REX::WARN("Missing setup for headgear.");
+		}
+
+		LoadWorkaround(setupJson);
+
+		return result;
+	}
+}
