@@ -81,18 +81,3 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 
 	return true;
 }
-
-// extern "C" DLLEXPORT constinit auto F4SEPlugin_Version = []() noexcept {
-// 	F4SE::PluginVersionData data{};
-
-// 	data.PluginVersion(REL::Version(1, 0, 0));
-// 	data.PluginName("ScatArmorPlugin");
-// 	data.AuthorName("maniman303");
-// 	data.UsesAddressLibrary(true);
-// 	data.UsesSigScanning(false);
-// 	data.IsLayoutDependent(true);
-// 	data.HasNoStructUse(false);
-// 	data.CompatibleVersions({ F4SE::RUNTIME_LATEST });
-
-// 	return data;
-// }();
