@@ -8,7 +8,6 @@
 #include "Hooks.h"
 #include "Files.h"
 #include "PapyrusUtil.h"
-#include "IndexProcessor.h"
 #include "ArmorProcessor.h"
 #include "HeadgearProcessor.h"
 
@@ -53,7 +52,6 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 			return;
 		}
 
-		// IndexProcessor::ProcessIndexLists();
 		ArmorProcessor::ProcessArmorFiles();
 		HeadgearProcessor::ProcessHeadgearFiles();
 

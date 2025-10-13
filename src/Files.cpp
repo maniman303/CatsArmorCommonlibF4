@@ -91,12 +91,6 @@ namespace Files
 			std::filesystem::create_directory(setupPath);
 		}
 
-		/*auto indexesPath = Files::GetPluginPath().append("Indexes");
-
-		if (!std::filesystem::exists(indexesPath)) {
-			std::filesystem::create_directory(indexesPath);
-		}*/
-
 		auto armorPath = Files::GetPluginPath().append("Armor");
 
 		if (!std::filesystem::exists(armorPath)) {
