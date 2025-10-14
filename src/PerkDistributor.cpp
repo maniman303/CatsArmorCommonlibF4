@@ -59,8 +59,61 @@ namespace PerkDistributor
             return false;
         }
 
-        npc->GetSpellList()->AddSpells({spell});
-        npc->AddPerks({perk}, 1);
+        bool res = true;
+
+        if (!npc->GetSpellList()->AddSpells({spell}))
+        {
+            REX::WARN("Failed to add spell.");
+            res = false;
+        }
+
+        if (!npc->AddPerks({perk}, 1))
+        {
+            REX::WARN("Failed to add perk.");
+            res = false;
+        }
+
+        return res;
+    }
+
+    bool TryRevertNpc(RE::TESNPC* npc)
+    {
+        if (npc == NULL)
+        {
+            // REX::INFO("Npc is null");
+            return false;
+        }
+
+        if (npc->IsPlayer() || npc->IsDeleted() || npc->IsSimpleActor())
+        {
+            // REX::INFO("Npc doesn't match criteria... [{}]", npc->GetFullName());
+            return false;
+        }
+
+        auto race = npc->GetFormRace();
+        if (!IsRaceOfHumanOrigin(race))
+        {
+            // REX::INFO("Npc is not human... [{}]", npc->GetFullName());
+            return false;
+        }
+
+        // REX::INFO("Found human! [{}]", npc->GetFullName());
+
+        auto spell = Setup::GetSpell();
+        auto perk = Setup::GetPerk();
+
+        if (spell == NULL || perk == NULL)
+        {
+            return false;
+        }
+
+        auto perkIndex = npc->GetPerkIndex(perk);
+        if (perkIndex.has_value() && perkIndex.value() > 0)
+        {
+            npc->RemovePerks({perk});
+        }
+
+        npc->GetSpellList()->RemoveSpells({spell});
 
         return true;
     }

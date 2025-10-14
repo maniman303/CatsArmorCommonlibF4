@@ -7,8 +7,6 @@ namespace Hooks
 	{
 		InitLoadGame::Hook(aThis, buf);
 
-		REX::INFO("Hook: InitLoadGame");
-
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -21,71 +19,56 @@ namespace Hooks
 			return;
 		}
 
-		PerkDistributor::TryProcessNpc(npc);
+		if (PerkDistributor::TryProcessNpc(npc))
+		{
+			REX::INFO("Hook: InitLoadGame");
+		}
 	}
 
 	bool ShouldBackgroundClone::thunk(RE::Actor* aThis)
 	{
-		bool res = ShouldBackgroundClone::Hook(aThis);
-
-		REX::INFO("Hook: ShouldBackgroundClone");
-		
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
-			return res;
+			return ShouldBackgroundClone::Hook(aThis);
 		}
 
-		auto niObj = aThis->GetFullyLoaded3D();
-		if (niObj == NULL)
+		if (PerkDistributor::TryProcessNpc(npc))
 		{
-			return res;
+			REX::INFO("Hook: ShouldBackgroundClone");
 		}
 
-		PerkDistributor::TryProcessNpc(npc);
-
-		return res;
+		return ShouldBackgroundClone::Hook(aThis);
 	}
 
 	void Revert::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
 		Revert::Hook(aThis, buf);
 
-		REX::INFO("Hook: Revert");
-
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
 			return;
 		}
 
-		auto niObj = aThis->GetFullyLoaded3D();
-		if (niObj == NULL)
-		{
-			return;
-		}
-
-		PerkDistributor::TryProcessNpc(npc);
+		PerkDistributor::TryRevertNpc(npc);
 	}
 
 	void LoadGame::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
-		LoadGame::Hook(aThis, buf);
-
-		REX::INFO("Hook: LoadGame");
-
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
+			LoadGame::Hook(aThis, buf);
+
 			return;
 		}
 
-		auto niObj = aThis->GetFullyLoaded3D();
-		if (niObj == NULL)
+		if (PerkDistributor::TryProcessNpc(npc))
 		{
-			return;
+			REX::INFO("Hook: LoadGame");
 		}
 
-		PerkDistributor::TryProcessNpc(npc);
+		LoadGame::Hook(aThis, buf);
 	}
 }
