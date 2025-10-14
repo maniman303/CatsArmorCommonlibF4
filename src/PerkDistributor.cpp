@@ -22,7 +22,7 @@ namespace PerkDistributor
         return IsRaceOfHumanOrigin(armorRace);
     }
 
-    bool TryProcessNpc(RE::TESNPC* npc)
+    bool IsNpcValid(RE::TESNPC* npc)
     {
         if (npc == NULL)
         {
@@ -30,7 +30,7 @@ namespace PerkDistributor
             return false;
         }
 
-        if (npc->IsPlayer() || npc->IsDeleted() || npc->IsSimpleActor())
+        if (npc->IsPlayer() || npc->IsDeleted())
         {
             // REX::INFO("Npc doesn't match criteria... [{}]", npc->GetFullName());
             return false;
@@ -40,6 +40,16 @@ namespace PerkDistributor
         if (!IsRaceOfHumanOrigin(race))
         {
             // REX::INFO("Npc is not human... [{}]", npc->GetFullName());
+            return false;
+        }
+
+        return true;
+    }
+
+    bool TryProcessNpc(RE::TESNPC* npc)
+    {
+        if (!IsNpcValid(npc))
+        {
             return false;
         }
 
@@ -61,16 +71,21 @@ namespace PerkDistributor
 
         bool res = true;
 
-        if (!npc->GetSpellList()->AddSpells({spell}))
+        if (!npc->GetSpellList()->AddSpells(std::vector<RE::SpellItem*>{spell}))
         {
             REX::WARN("Failed to add spell.");
             res = false;
         }
 
-        if (!npc->AddPerks({perk}, 1))
+        if (!npc->AddPerks(std::vector<RE::BGSPerk*>{perk}, 1))
         {
             REX::WARN("Failed to add perk.");
             res = false;
+        }
+
+        if (res)
+        {
+            // REX::INFO("Added spell and perk to [{}]", npc->GetFullName());
         }
 
         return res;
@@ -78,26 +93,10 @@ namespace PerkDistributor
 
     bool TryRevertNpc(RE::TESNPC* npc)
     {
-        if (npc == NULL)
+        if (!IsNpcValid(npc))
         {
-            // REX::INFO("Npc is null");
             return false;
         }
-
-        if (npc->IsPlayer() || npc->IsDeleted() || npc->IsSimpleActor())
-        {
-            // REX::INFO("Npc doesn't match criteria... [{}]", npc->GetFullName());
-            return false;
-        }
-
-        auto race = npc->GetFormRace();
-        if (!IsRaceOfHumanOrigin(race))
-        {
-            // REX::INFO("Npc is not human... [{}]", npc->GetFullName());
-            return false;
-        }
-
-        // REX::INFO("Found human! [{}]", npc->GetFullName());
 
         auto spell = Setup::GetSpell();
         auto perk = Setup::GetPerk();
@@ -110,10 +109,12 @@ namespace PerkDistributor
         auto perkIndex = npc->GetPerkIndex(perk);
         if (perkIndex.has_value() && perkIndex.value() > 0)
         {
-            npc->RemovePerks({perk});
+            npc->RemovePerks(std::vector<RE::BGSPerk*>{perk});
         }
 
-        npc->GetSpellList()->RemoveSpells({spell});
+        npc->GetSpellList()->RemoveSpells(std::vector<RE::SpellItem*>{spell});
+
+        // REX::INFO("Removed spell and perk from [{}]", npc->GetFullName());
 
         return true;
     }

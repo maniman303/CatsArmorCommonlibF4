@@ -37,6 +37,7 @@ namespace HeadgearProcessor
 
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
+		uint32_t headbandMask = 1 << 16;
 		uint32_t hairBeardMask = 1 << 18;
 
 		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
@@ -59,6 +60,7 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots & ~hairLongMask;
 		bipedSlots = bipedSlots & ~hairBeardMask;
 
+		bipedSlots = bipedSlots | headbandMask;
 		bipedSlots = bipedSlots | newSlot;
 
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
