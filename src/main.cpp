@@ -33,6 +33,7 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 {
 	if (message-> type == F4SE::MessagingInterface::kPostLoad)
 	{
+		REX::INFO("kPostLoad");
 		Hooks::Install();
 	}
 
@@ -77,8 +78,7 @@ bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
 
 F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 {
-	F4SE::Init(a_f4se, F4SE::InitInfo());
-	F4SE::AllocTrampoline(20);
+	F4SE::Init(a_f4se);
 
 	InitModCore(a_f4se);
 

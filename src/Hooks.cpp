@@ -7,6 +7,8 @@ namespace Hooks
 	{
 		InitLoadGame::func(aThis, buf);
 
+		REX::INFO("Hook: InitLoadGame");
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -19,14 +21,14 @@ namespace Hooks
 			return;
 		}
 
-		REX::INFO("Hook: InitLoadGame");
-
 		PerkDistributor::TryProcessNpc(npc);
 	}
 
 	bool ShouldBackgroundClone::thunk(RE::Actor* aThis)
 	{
 		bool res = ShouldBackgroundClone::func(aThis);
+
+		REX::INFO("Hook: ShouldBackgroundClone");
 		
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
@@ -40,8 +42,6 @@ namespace Hooks
 			return res;
 		}
 
-		REX::INFO("Hook: ShouldBackgroundClone");
-
 		PerkDistributor::TryProcessNpc(npc);
 
 		return res;
@@ -51,6 +51,8 @@ namespace Hooks
 	{
 		Revert::func(aThis, buf);
 
+		REX::INFO("Hook: Revert");
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -62,8 +64,6 @@ namespace Hooks
 		{
 			return;
 		}
-
-		REX::INFO("Hook: Revert");
 
 		PerkDistributor::TryProcessNpc(npc);
 	}
@@ -72,6 +72,8 @@ namespace Hooks
 	{
 		LoadGame::func(aThis, buf);
 
+		REX::INFO("Hook: LoadGame");
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -83,8 +85,6 @@ namespace Hooks
 		{
 			return;
 		}
-
-		REX::INFO("Hook: LoadGame");
 
 		PerkDistributor::TryProcessNpc(npc);
 	}
@@ -95,5 +95,7 @@ namespace Hooks
 		Hooks::WriteVFunc<RE::Actor, Hooks::ShouldBackgroundClone>();
 		Hooks::WriteVFunc<RE::Actor, Hooks::Revert>();
 		Hooks::WriteVFunc<RE::Actor, Hooks::LoadGame>();
+		
+		REX::INFO("Hooks installed");
 	}
 }
