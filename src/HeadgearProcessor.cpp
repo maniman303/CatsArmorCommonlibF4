@@ -9,19 +9,11 @@
 
 namespace HeadgearProcessor
 {
-	static void SetArmorAddonBipedIndexes(RE::TESObjectARMA* addon, Setup::TypedSetup setup)
+	static void SetArmorAddonBipedIndexes(RE::TESObjectARMA* addon, uint32_t mainBipedSlots, Setup::TypedSetup setup)
 	{
-		uint32_t hairTopMask = 1;
-		uint32_t hairLongMask = 2;
-		uint32_t hairBeardMask = 1 << 18;
-
 		auto bipedSlots = addon->bipedModelData.bipedObjectSlots;
 
-		bipedSlots = bipedSlots & ~hairTopMask;
-		bipedSlots = bipedSlots & ~hairLongMask;
-		bipedSlots = bipedSlots & ~hairBeardMask;
-		
-		if (bipedSlots == 0) {
+		if ((bipedSlots & mainBipedSlots) == 0) {
 			uint32_t newSlot = 1 << (setup.bipedIndex - 30);
 
 			bipedSlots = addon->bipedModelData.bipedObjectSlots;
@@ -41,6 +33,8 @@ namespace HeadgearProcessor
 		uint32_t headbandMask = 1 << 16;
 
 		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
+
+		// REX::INFO("Processing [{}].", armor->GetFullName());
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
 
@@ -69,7 +63,7 @@ namespace HeadgearProcessor
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
 
 		for (auto& ae : armor->modelArray) {
-			SetArmorAddonBipedIndexes(ae.armorAddon, setup);
+			SetArmorAddonBipedIndexes(ae.armorAddon, bipedSlots, setup);
 		}
 
 		return res;
