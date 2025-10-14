@@ -31,12 +31,6 @@ bool InitModCore(const F4SE::QueryInterface* a_f4se)
 
 void OnMessage(F4SE::MessagingInterface::Message* message)
 {
-	if (message-> type == F4SE::MessagingInterface::kPostLoad)
-	{
-		REX::INFO("kPostLoad");
-		Hooks::Install();
-	}
-
 	if (message->type == F4SE::MessagingInterface::kGameDataReady)
 	{
 		if (!Files::VerifyPaths())

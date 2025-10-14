@@ -5,7 +5,7 @@ namespace Hooks
 {
 	void InitLoadGame::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
-		InitLoadGame::func(aThis, buf);
+		InitLoadGame::Hook(aThis, buf);
 
 		REX::INFO("Hook: InitLoadGame");
 
@@ -26,7 +26,7 @@ namespace Hooks
 
 	bool ShouldBackgroundClone::thunk(RE::Actor* aThis)
 	{
-		bool res = ShouldBackgroundClone::func(aThis);
+		bool res = ShouldBackgroundClone::Hook(aThis);
 
 		REX::INFO("Hook: ShouldBackgroundClone");
 		
@@ -49,7 +49,7 @@ namespace Hooks
 
 	void Revert::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
-		Revert::func(aThis, buf);
+		Revert::Hook(aThis, buf);
 
 		REX::INFO("Hook: Revert");
 
@@ -70,7 +70,7 @@ namespace Hooks
 
 	void LoadGame::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
-		LoadGame::func(aThis, buf);
+		LoadGame::Hook(aThis, buf);
 
 		REX::INFO("Hook: LoadGame");
 
@@ -87,15 +87,5 @@ namespace Hooks
 		}
 
 		PerkDistributor::TryProcessNpc(npc);
-	}
-
-	void Install()
-	{
-		Hooks::WriteVFunc<RE::Actor, Hooks::InitLoadGame>();
-		Hooks::WriteVFunc<RE::Actor, Hooks::ShouldBackgroundClone>();
-		Hooks::WriteVFunc<RE::Actor, Hooks::Revert>();
-		Hooks::WriteVFunc<RE::Actor, Hooks::LoadGame>();
-		
-		REX::INFO("Hooks installed");
 	}
 }

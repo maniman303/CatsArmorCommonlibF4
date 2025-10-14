@@ -8,46 +8,27 @@ namespace Hooks
 	{
 		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
 
-		static inline REL::Relocation<decltype(thunk)> func;
-		static inline constexpr std::size_t idx{ 0x13 };
+		static inline REL::HookVFT Hook{ RE::Actor::VTABLE[0], 0x13, thunk };
 	};
 
 	struct ShouldBackgroundClone
 	{
 		static bool thunk(RE::Actor* aThis);
 
-		static inline REL::Relocation<decltype(thunk)> func;
-		static inline constexpr std::size_t idx{ 0x89 };
+		static inline REL::HookVFT Hook{ RE::Actor::VTABLE[0], 0x89, thunk };
 	};
 
 	struct Revert
 	{
 		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
 
-		static inline REL::Relocation<decltype(thunk)> func;
-		static inline size_t idx{ 0x15 };
+		static inline REL::HookVFT Hook{ RE::Actor::VTABLE[0], 0x15, thunk };
 	};
 
 	struct LoadGame
 	{
 		static void thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf);
 
-		static inline REL::Relocation<decltype(thunk)> func;
-		static inline size_t idx{ 0x12 };
+		static inline REL::HookVFT Hook{ RE::Actor::VTABLE[0], 0x12, thunk };
 	};
-
-	void Install();
-
-	template <class F, size_t index, class T>
-	void WriteVFunc()
-	{
-		REL::Relocation<std::uintptr_t> vtbl{ F::VTABLE[index] };
-		T::func = vtbl.write_vfunc(T::idx, T::thunk);
-	}
-
-	template <class F, class T>
-	void WriteVFunc()
-	{
-		WriteVFunc<F, 0, T>();
-	}
 }
