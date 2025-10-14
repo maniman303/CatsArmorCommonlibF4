@@ -21,7 +21,7 @@ namespace Hooks
 
 		if (PerkDistributor::TryProcessNpc(npc))
 		{
-			REX::INFO("Hook: InitLoadGame");
+			// REX::INFO("Hook: InitLoadGame");
 		}
 	}
 
@@ -35,7 +35,7 @@ namespace Hooks
 
 		if (PerkDistributor::TryProcessNpc(npc))
 		{
-			REX::INFO("Hook: ShouldBackgroundClone");
+			// REX::INFO("Hook: ShouldBackgroundClone");
 		}
 
 		return ShouldBackgroundClone::Hook(aThis);
@@ -66,7 +66,7 @@ namespace Hooks
 
 		if (PerkDistributor::TryProcessNpc(npc))
 		{
-			REX::INFO("Hook: LoadGame");
+			// REX::INFO("Hook: LoadGame");
 		}
 
 		LoadGame::Hook(aThis, buf);
