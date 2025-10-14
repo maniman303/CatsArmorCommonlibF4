@@ -10,6 +10,7 @@
 #include "PapyrusUtil.h"
 #include "ArmorProcessor.h"
 #include "HeadgearProcessor.h"
+#include "PerkDistributor.h"
 
 bool InitModCore(const F4SE::QueryInterface* a_f4se)
 {
@@ -59,6 +60,8 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 
 		ArmorProcessor::ProcessArmorFiles();
 		HeadgearProcessor::ProcessHeadgearFiles();
+
+		PerkDistributor::ProcessMemoryActors();
 
 		REX::INFO("Finished pre-game processing.");
 	}

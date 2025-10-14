@@ -8,6 +8,8 @@
 namespace Setup
 {
 	std::map<int, uint16_t> WorkaroundMap;
+	RE::SpellItem* Spell;
+	RE::BGSPerk* Perk;
 
 	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword)
 	{
@@ -74,6 +76,16 @@ namespace Setup
 		}
 
 		return TypedSetup();
+	}
+
+	RE::SpellItem* GetSpell()
+	{
+		return Spell;
+	}
+
+	RE::BGSPerk* GetPerk()
+	{
+		return Perk;
 	}
 
 	bool LoadTypedSetup(Json::Value setup, std::string type)
@@ -154,12 +166,41 @@ namespace Setup
 		return true;
 	}
 
+	bool LoadSpellAndPerk(Json::Value setup)
+	{
+		Spell = NULL;
+		Perk = NULL;
+
+		auto magicSetup = setup["magic"];
+
+		if (magicSetup.empty()) {
+			REX::WARN("Magic setup is missing.");
+			return false;
+		}
+
+		auto spell = FormUtil::GetFormFromJson(magicSetup["spell"], RE::ENUM_FORM_ID::kSPEL);
+		if (spell == NULL || spell->GetFormType() != RE::ENUM_FORM_ID::kSPEL) {
+			REX::WARN("Magic setup is missing spell.");
+			return false;
+		}
+
+		auto perk = FormUtil::GetFormFromJson(magicSetup["perk"], RE::ENUM_FORM_ID::kPERK);
+		if (perk == NULL || perk->GetFormType() != RE::ENUM_FORM_ID::kPERK) {
+			REX::WARN("Magic setup is missing perk.");
+			return false;
+		}
+
+		Spell = spell->As<RE::SpellItem>();
+		Perk = perk->As<RE::BGSPerk>();
+
+		return true;
+	}
+
 	void LoadWorkaround(Json::Value setup)
 	{
 		auto workaroundSetup = setup["workaround"];
 
 		if (workaroundSetup.empty()) {
-			REX::WARN("Workaround setup is missing.");
 			return;
 		}
 
@@ -192,8 +233,6 @@ namespace Setup
 		if (SetupMap.contains("headgear") && SetupMap["headgear"].attachSlot != NULL) {
 			WorkaroundMap[SetupMap["headgear"].attachSlot->GetFormID()] = form->attachParents.array[5].keywordIndex;
 		}
-
-		REX::INFO("Workaround loaded successfully.");
 	}
 
 	bool Initialize()
@@ -251,6 +290,8 @@ namespace Setup
 		if (!LoadHeadgearSetup(setupJson)) {
 			REX::WARN("Missing setup for headgear.");
 		}
+
+		LoadSpellAndPerk(setupJson);
 
 		LoadWorkaround(setupJson);
 

@@ -1,4 +1,5 @@
 #include "Hooks.h"
+#include "PerkDistributor.h"
 
 namespace Hooks
 {
@@ -18,7 +19,9 @@ namespace Hooks
 			return;
 		}
 
-		// TODO: Update perk / spell
+		REX::INFO("Hook: InitLoadGame");
+
+		PerkDistributor::TryProcessNpc(npc);
 	}
 
 	bool ShouldBackgroundClone::thunk(RE::Actor* aThis)
@@ -37,7 +40,9 @@ namespace Hooks
 			return res;
 		}
 
-		// TODO: Update perk / spell
+		REX::INFO("Hook: ShouldBackgroundClone");
+
+		PerkDistributor::TryProcessNpc(npc);
 
 		return res;
 	}
@@ -58,7 +63,9 @@ namespace Hooks
 			return;
 		}
 
-		// TODO: Update perk / spell
+		REX::INFO("Hook: Revert");
+
+		PerkDistributor::TryProcessNpc(npc);
 	}
 
 	void LoadGame::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
@@ -77,7 +84,9 @@ namespace Hooks
 			return;
 		}
 
-		// TODO: Update perk / spell
+		REX::INFO("Hook: LoadGame");
+
+		PerkDistributor::TryProcessNpc(npc);
 	}
 
 	void Install()

@@ -30,6 +30,10 @@ namespace Setup
 
 	TypedSetup GetForms(std::string type);
 
+	RE::SpellItem* GetSpell();
+
+	RE::BGSPerk* GetPerk();
+
 	bool LoadTypedSetup(Json::Value setup, std::string type);
 
 	void LoadWorkaround(Json::Value setup);
