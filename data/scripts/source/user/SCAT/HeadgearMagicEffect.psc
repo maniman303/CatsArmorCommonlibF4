@@ -20,17 +20,22 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
 
     bool isHidden = akTarget.WornHasKeyword(HeadgearHiddenKey)
 
-    ; SCAT:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
+    ;SCAT:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
+	;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] IsHidden: " + isHidden)
 
     if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
+		;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] Equip long hair")
         akTarget.EquipItem(HairLong, abSilent = true)
     else
+		;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] Unequip long hair")
         akTarget.UnequipItem(HairLong, abSilent = true)
     endif
 
     if (akTarget.WornHasKeyword(HairTopKey) && !isHidden)
+		;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] Equip hair top")
         akTarget.EquipItem(HairTop, abSilent = true)
     else
+		;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] Unequip hair top")
         akTarget.UnequipItem(HairTop, abSilent = true)
     endif
 

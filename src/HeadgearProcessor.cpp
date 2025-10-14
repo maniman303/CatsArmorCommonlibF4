@@ -37,22 +37,25 @@ namespace HeadgearProcessor
 
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
-		uint32_t headbandMask = 1 << 16;
 		uint32_t hairBeardMask = 1 << 18;
+		uint32_t headbandMask = 1 << 16;
 
 		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
 
-		if (bipedSlots & ~hairTopMask) {
+		if (bipedSlots & hairTopMask)
+		{
 			res.push_back(setup.keywordHairTop);
 		}
 
-		if (bipedSlots & ~hairLongMask) {
+		if (bipedSlots & hairLongMask)
+		{
 			res.push_back(setup.keywordHairLong);
 		}
 
-		if (bipedSlots & ~hairBeardMask) {
+		if (bipedSlots & hairBeardMask)
+		{
 			res.push_back(setup.keywordHairBeard);
 		}
 
@@ -60,8 +63,8 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots & ~hairLongMask;
 		bipedSlots = bipedSlots & ~hairBeardMask;
 
-		bipedSlots = bipedSlots | headbandMask;
 		bipedSlots = bipedSlots | newSlot;
+		bipedSlots = bipedSlots | headbandMask;
 
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
 
