@@ -18,6 +18,16 @@ Keyword Property RightArmKey Auto Const
 Keyword Property LeftLegKey Auto Const
 Keyword Property RightLegKey Auto Const
 
+Keyword Property HairLongKey Auto Const
+Keyword Property HairTopKey Auto Const
+Keyword Property HairBeardKey Auto Const
+
+Armor Property HairLong Auto Const
+Armor Property HairTop Auto Const
+Armor Property HairBeard Auto Const
+
+Spell Property HeadgearAbility Auto Const
+
 Perk Property HeadgearPerk Auto Const
 
 Event OnQuestInit()
@@ -165,4 +175,47 @@ Form Function GetEquippedArmor(int index)
 	endIf
 	
 	return item.Item
+EndFunction
+
+bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
+    if (akTarget == NONE)
+        return false
+    endif
+
+	bool res = false
+    bool isHidden = akTarget.WornHasKeyword(HeadgearHiddenKey)
+
+    ;SCAT:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
+	;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] IsHidden: " + isHidden)
+
+    if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
+		res = res || !akTarget.IsEquipped(HairLong)
+        akTarget.EquipItem(HairLong, abSilent = checkAbility)
+    else
+		res = res || akTarget.IsEquipped(HairLong)
+        akTarget.UnequipItem(HairLong, abSilent = checkAbility)
+    endif
+
+    if (akTarget.WornHasKeyword(HairTopKey) && !isHidden)
+		res = res || !akTarget.IsEquipped(HairTop)
+        akTarget.EquipItem(HairTop, abSilent = checkAbility)
+    else
+		res = res || akTarget.IsEquipped(HairTop)
+        akTarget.UnequipItem(HairTop, abSilent = checkAbility)
+    endif
+
+    if (akTarget.WornHasKeyword(HairBeardKey) && !isHidden)
+		res = res || !akTarget.IsEquipped(HairBeard)
+        akTarget.EquipItem(HairBeard, abSilent = checkAbility)
+    else
+		res = res || akTarget.IsEquipped(HairBeard)
+        akTarget.UnequipItem(HairBeard, abSilent = checkAbility)
+    endif
+
+    if (checkAbility && HeadgearAbility != NONE && akTarget.HasSpell(HeadgearAbility))
+        ; SCAT:ScriptExtender.Trace("Removing one shot ability.")
+        akTarget.RemoveSpell(HeadgearAbility)
+    endif
+	
+	return res
 EndFunction
