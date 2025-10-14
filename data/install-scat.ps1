@@ -49,26 +49,18 @@ $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyI
 Write-Host "Script directory: $ScriptDir"
 
 # Source items
-$fileName = 'Scat Armor SPID_DISTR.ini'
-$srcFile = Join-Path $ScriptDir $fileName
 $srcMeshes = Join-Path $ScriptDir 'meshes\armor\ScatArmor'
 $srcScripts = Join-Path $ScriptDir 'scripts\source\user\SCAT'
 
 # Destination items
-$dstFile = Join-Path $TargetPath $fileName
 $dstMeshes = Join-Path $TargetPath 'meshes\armor\ScatArmor'
 $dstScripts = Join-Path $TargetPath 'scripts\source\user\SCAT'
 
 Write-Host "Will create symlinks:"
-Write-Host "  File:    $dstFile -> $srcFile"
 Write-Host "  Meshes:  $dstMeshes -> $srcMeshes"
 Write-Host "  Scripts: $dstScripts -> $srcScripts"
 
 # Validate sources
-if (-not (Test-Path -LiteralPath $srcFile -PathType Leaf)) {
-    Write-Error "Source file not found: $srcFile. Exiting."
-    exit 2
-}
 if (-not (Test-Path -LiteralPath $srcMeshes -PathType Container)) {
     Write-Error "Source meshes folder not found: $srcMeshes. Exiting."
     exit 3
@@ -104,7 +96,6 @@ function Prepare-Destination($dst) {
 
 # Ensure parent folders exist
 foreach ($folder in @(
-    (Split-Path -Parent $dstFile),
     (Split-Path -Parent $dstMeshes),
     (Split-Path -Parent $dstScripts)
 )) {
@@ -115,19 +106,10 @@ foreach ($folder in @(
 }
 
 # Prepare (backup/remove) existing items
-Prepare-Destination -dst $dstFile
 Prepare-Destination -dst $dstMeshes
 Prepare-Destination -dst $dstScripts
 
 # Create symlinks
-try {
-    Write-Host "Creating file symlink: $dstFile -> $srcFile"
-    New-Item -ItemType SymbolicLink -Path $dstFile -Target $srcFile -Force | Out-Null
-} catch {
-    Write-Error "Failed to create file symlink: $_"
-    exit 5
-}
-
 try {
     Write-Host "Creating directory symlink: $dstMeshes -> $srcMeshes"
     New-Item -ItemType SymbolicLink -Path $dstMeshes -Target $srcMeshes -Force | Out-Null
