@@ -169,6 +169,58 @@ namespace HeadgearProcessor
 		REX::INFO(std::format("Processed {0} headgear records.", count));
 	}
 
+	void AdjustHairOnlyHeadgear(Setup::TypedSetup setup)
+	{
+		uint32_t hairTopMask = 1;
+		uint32_t hairLongMask = 2;
+
+		uint32_t mask = hairTopMask;
+		mask = mask | hairLongMask;
+
+		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
+
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+
+		if (dataHandler == NULL)
+		{
+			return;
+		}
+
+		const auto& armorArray = dataHandler->GetFormArray<RE::TESObjectARMO>();
+
+		int adjusted = 0;
+
+    	for (auto* armor : armorArray)
+		{
+			if ((armor->formFlags & 4) != 0)
+			{
+				continue;
+			}
+
+			auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
+
+			if ((bipedSlots & ~mask) != 0 || bipedSlots == 0)
+			{
+				continue;
+			}
+
+			if (armor->HasKeyword(setup.keyword))
+			{
+				continue;
+			}
+
+			bipedSlots = bipedSlots | newSlot;
+
+			armor->bipedModelData.bipedObjectSlots = bipedSlots;
+
+			adjusted++;
+			
+			// REX::INFO("Wrong headgear [{}]", armor->GetFullName());
+		}
+
+		REX::INFO("Adjusted {} headgears.", adjusted);
+	}
+
 	void ProcessHeadgearFiles()
 	{
 		auto setup = Setup::GetForms("headgear");
@@ -204,5 +256,7 @@ namespace HeadgearProcessor
 				}
 			}
 		}
+
+		AdjustHairOnlyHeadgear(setup);
 	}
 }
