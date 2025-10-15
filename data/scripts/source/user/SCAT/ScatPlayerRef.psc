@@ -4,8 +4,6 @@ Quest Property ScatQuest Auto Const
 
 Perk Property HeadgearPerk Auto Const
 
-Keyword Property ActorTypeNPC Auto Const
-
 Bool isMenuOpen
 
 Event OnPlayerLoadGame()
@@ -16,6 +14,8 @@ Event OnPlayerLoadGame()
 	isMenuOpen = false
 	
 	RegisterForMenuOpenCloseEvent("ContainerMenu")
+	
+	AddInventoryEventFilter((ScatQuest as SCAT:GivePlayerHolotape).HeadgearKey)
 EndEvent
 
 Event OnMenuOpenCloseEvent(string asMenuName, bool abOpening)
@@ -30,33 +30,18 @@ Event OnMenuOpenCloseEvent(string asMenuName, bool abOpening)
 	endif
 	
 	while isMenuOpen && Game.GetPlayer().HasPerk(HeadgearPerk)
-		Utility.WaitMenuMode(0.1)
-		UpdateHeadgearOfNearbyActors()
+		Utility.WaitMenuMode(0.05)
+		(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors()
 	endwhile
 endEvent
 
-Function UpdateHeadgearOfNearbyActors()
-	Actor Player = Game.GetPlayer()
-	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorTypeNPC, 2048.0)
-
-	int playerIndex = kActors.Find(Player as Actor)
-	kActors.Remove(playerIndex)
+Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+	if (isMenuOpen || akSourceContainer == None)
+		return
+	endif
 	
-	int actorsLength = kActors.length
-	int i = 0
-	while i < actorsLength
-		ObjectReference object = kActors[i]
-		if (object is Actor)
-			Actor npc = object as Actor
-			;SCAT:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
-			if ((ScatQuest as SCAT:GivePlayerHolotape).ValidateHeadgearHair(npc, false))
-				npc.QueueUpdate(true, 0xC)
-			endif
-		endif
-		
-		i = i + 1
-	endwhile
-EndFunction
+	(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors(akBaseItem)
+endEvent
 
 ; Event OnItemEquipped(Form akBaseObject, ObjectReference akReference)
 	

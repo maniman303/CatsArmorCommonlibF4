@@ -30,6 +30,8 @@ Spell Property HeadgearAbility Auto Const
 
 Perk Property HeadgearPerk Auto Const
 
+Keyword Property ActorTypeNPC Auto Const
+
 Event OnQuestInit()
 	TryToGiveItems()
 EndEvent
@@ -190,26 +192,26 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 
     if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairLong)
-        akTarget.EquipItem(HairLong, abSilent = checkAbility)
+        akTarget.EquipItem(HairLong, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairLong)
-        akTarget.UnequipItem(HairLong, abSilent = checkAbility)
+        akTarget.UnequipItem(HairLong, abSilent = true)
     endif
 
     if (akTarget.WornHasKeyword(HairTopKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairTop)
-        akTarget.EquipItem(HairTop, abSilent = checkAbility)
+        akTarget.EquipItem(HairTop, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairTop)
-        akTarget.UnequipItem(HairTop, abSilent = checkAbility)
+        akTarget.UnequipItem(HairTop, abSilent = true)
     endif
 
     if (akTarget.WornHasKeyword(HairBeardKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairBeard)
-        akTarget.EquipItem(HairBeard, abSilent = checkAbility)
+        akTarget.EquipItem(HairBeard, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairBeard)
-        akTarget.UnequipItem(HairBeard, abSilent = checkAbility)
+        akTarget.UnequipItem(HairBeard, abSilent = true)
     endif
 
     if (checkAbility && HeadgearAbility != NONE && akTarget.HasSpell(HeadgearAbility))
@@ -218,4 +220,31 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
     endif
 	
 	return res
+EndFunction
+
+Function UpdateHeadgearOfNearbyActors(Form akBaseItem = None)
+	if (akBaseItem != None && !akBaseItem.HasKeyword(HeadgearKey))
+		return
+	endif
+
+	Actor Player = Game.GetPlayer()
+	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorTypeNPC, 360)
+	
+	int actorsLength = kActors.length
+	
+	;SCAT:ScriptExtender.Trace("Found " + actorsLength + " actors")
+	
+	int i = 0
+	while i < actorsLength
+		ObjectReference object = kActors[i]
+		if (object is Actor)
+			Actor npc = object as Actor
+			;SCAT:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
+			if (ValidateHeadgearHair(npc, false))
+				npc.QueueUpdate(true, 0xC)
+			endif
+		endif
+		
+		i = i + 1
+	endwhile
 EndFunction
