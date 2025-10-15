@@ -16,11 +16,10 @@ namespace HeadgearProcessor
 		if ((bipedSlots & mainBipedSlots) == 0) {
 			uint32_t newSlot = 1 << (setup.bipedIndex - 30);
 
-			bipedSlots = addon->bipedModelData.bipedObjectSlots;
 			bipedSlots = bipedSlots | newSlot;
-
-			addon->bipedModelData.bipedObjectSlots = bipedSlots;
 		}
+
+		addon->bipedModelData.bipedObjectSlots = bipedSlots;
 	}
 
 	static std::vector<RE::BGSKeyword*> SetArmorBipedIndexes(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
@@ -61,6 +60,12 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots | headbandMask;
 
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
+
+		auto modelsSize = armor->modelArray.size();
+		if (modelsSize > 1)
+		{
+			// REX::WARN("Many ARMO: {} [{}]", modelsSize, armor->GetFullName());
+		}
 
 		for (auto& ae : armor->modelArray) {
 			SetArmorAddonBipedIndexes(ae.armorAddon, bipedSlots, setup);
@@ -131,7 +136,6 @@ namespace HeadgearProcessor
 
 		armor->AddKeyword(setup.keyword);
 
-		//Workaround::AddAttachKeyword(armor, setup.attachSlot);
 		armor->attachParents.AddKeyword(setup.attachSlot);
 
 		TrySetBaseIndex(armor);
@@ -142,7 +146,7 @@ namespace HeadgearProcessor
 	static void ProcessHeadgearRecords(RE::TESForm* listBasic, Setup::TypedSetup setup)
 	{
 		if (listBasic == NULL || listBasic->GetFormType() != RE::ENUM_FORM_ID::kFLST) {
-			REX::INFO("Invalid index form list.");
+			REX::ERROR("Invalid index form list.");
 			return;
 		}
 
@@ -169,7 +173,7 @@ namespace HeadgearProcessor
 		REX::INFO(std::format("Processed {0} headgear records.", count));
 	}
 
-	void AdjustHairOnlyHeadgear(Setup::TypedSetup setup)
+	bool AdjustHairOnlyHeadgear(RE::TESObjectARMO *armor, Setup::TypedSetup setup)
 	{
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
@@ -179,6 +183,32 @@ namespace HeadgearProcessor
 
 		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
 
+		if ((armor->formFlags & 4) != 0)
+		{
+			return false;
+		}
+
+		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
+
+		if ((bipedSlots & ~mask) != 0 || bipedSlots == 0)
+		{
+			return false;
+		}
+
+		if (armor->HasKeyword(setup.keyword))
+		{
+			return false;
+		}
+
+		bipedSlots = bipedSlots | newSlot;
+
+		armor->bipedModelData.bipedObjectSlots = bipedSlots;
+
+		return true;
+	}
+
+	void ProcessHairOnlyHeadgear(Setup::TypedSetup setup)
+	{
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
 
 		if (dataHandler == NULL)
@@ -192,30 +222,12 @@ namespace HeadgearProcessor
 
     	for (auto* armor : armorArray)
 		{
-			if ((armor->formFlags & 4) != 0)
+			if (AdjustHairOnlyHeadgear(armor, setup))
 			{
-				continue;
+				adjusted++;
+
+				// REX::INFO("Wrong headgear [{}]", armor->GetFullName());
 			}
-
-			auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
-
-			if ((bipedSlots & ~mask) != 0 || bipedSlots == 0)
-			{
-				continue;
-			}
-
-			if (armor->HasKeyword(setup.keyword))
-			{
-				continue;
-			}
-
-			bipedSlots = bipedSlots | newSlot;
-
-			armor->bipedModelData.bipedObjectSlots = bipedSlots;
-
-			adjusted++;
-			
-			// REX::INFO("Wrong headgear [{}]", armor->GetFullName());
 		}
 
 		REX::INFO("Adjusted {} headgears.", adjusted);
@@ -257,6 +269,6 @@ namespace HeadgearProcessor
 			}
 		}
 
-		AdjustHairOnlyHeadgear(setup);
+		ProcessHairOnlyHeadgear(setup);
 	}
 }

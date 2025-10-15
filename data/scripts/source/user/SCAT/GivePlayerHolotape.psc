@@ -192,7 +192,7 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 
     if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairLong)
-        akTarget.EquipItem(HairLong, abSilent = true)
+        akTarget.EquipItem(HairLong, abPreventRemoval = true, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairLong)
         akTarget.UnequipItem(HairLong, abSilent = true)
@@ -200,7 +200,7 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 
     if (akTarget.WornHasKeyword(HairTopKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairTop)
-        akTarget.EquipItem(HairTop, abSilent = true)
+        akTarget.EquipItem(HairTop, abPreventRemoval = true, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairTop)
         akTarget.UnequipItem(HairTop, abSilent = true)
@@ -208,7 +208,7 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 
     if (akTarget.WornHasKeyword(HairBeardKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairBeard)
-        akTarget.EquipItem(HairBeard, abSilent = true)
+        akTarget.EquipItem(HairBeard, abPreventRemoval = true, abSilent = true)
     else
 		res = res || akTarget.IsEquipped(HairBeard)
         akTarget.UnequipItem(HairBeard, abSilent = true)
