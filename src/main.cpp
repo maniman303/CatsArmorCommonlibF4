@@ -11,6 +11,7 @@
 #include "ArmorProcessor.h"
 #include "HeadgearProcessor.h"
 #include "PerkDistributor.h"
+#include "ActorEquipManagerListener.h"
 
 bool InitModCore(const F4SE::QueryInterface* a_f4se)
 {
@@ -56,6 +57,8 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 		ArmorProcessor::ProcessArmorFiles();
 		HeadgearProcessor::ProcessHeadgearFiles();
 
+		ActorEquipManagerListener::Register();
+
 		PerkDistributor::ProcessMemoryActors();
 
 		REX::INFO("Finished pre-game processing.");
@@ -72,7 +75,7 @@ bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
 
 F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 {
-	F4SE::Init(a_f4se);
+	F4SE::Init(a_f4se, { .trampoline = true });
 
 	InitModCore(a_f4se);
 	
