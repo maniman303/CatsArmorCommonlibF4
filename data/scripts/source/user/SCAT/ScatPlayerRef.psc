@@ -6,6 +6,13 @@ Perk Property HeadgearPerk Auto Const
 
 Bool isMenuOpen
 
+Function AddHeadgear()
+	FormList fHeadgear = Game.GetFormFromFile(0x41, "Scat Armor.esl") as FormList
+	FormList fHeadwear = Game.GetFormFromFile(0x42, "Scat Armor.esl") as FormList
+	
+	
+EndFunction
+
 Event OnPlayerLoadGame()
     (ScatQuest as SCAT:GivePlayerHolotape).TryToGiveItems()
 	
@@ -16,6 +23,8 @@ Event OnPlayerLoadGame()
 	RegisterForMenuOpenCloseEvent("ContainerMenu")
 	
 	AddInventoryEventFilter((ScatQuest as SCAT:GivePlayerHolotape).HeadgearKey)
+	
+	AddHeadgear()
 EndEvent
 
 Event OnMenuOpenCloseEvent(string asMenuName, bool abOpening)

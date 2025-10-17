@@ -75,7 +75,7 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 	F4SE::Init(a_f4se);
 
 	InitModCore(a_f4se);
-
+	
 	F4SE::GetPapyrusInterface()->Register(BindPapyrusFunctions);
 
 	F4SE::GetMessagingInterface()->RegisterListener(OnMessage);
