@@ -21,7 +21,18 @@ Event OnPlayerLoadGame()
 EndEvent
 
 Event OnHeadgearEquipEvent()
+	; if (aTarget == None)
+	; 	return
+	; endif
+	
+	; if (!(aTarget is Actor))
+	; 	return
+	; endif
+
 	SCAT:ScriptExtender.Trace("Received HeadgearEquipEvent.")
+	
+	; (ScatQuest as SCAT:GivePlayerHolotape).ValidateHeadgearHair(aTarget as Actor, false)
+	
 	(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors()
 EndEvent
 
