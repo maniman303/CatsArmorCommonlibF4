@@ -1,6 +1,7 @@
 #include "PerkDistributor.h"
 #include "FormUtil.h"
 #include "Setup.h"
+#include "Files.h"
 
 namespace PerkDistributor
 {
@@ -24,6 +25,11 @@ namespace PerkDistributor
 
     bool IsNpcValid(RE::TESNPC* npc, bool excludePlayer)
     {
+        if (!Files::IsFilePresent() || !Setup::IsInitialized())
+        {
+            return false;
+        }
+
         if (npc == NULL)
         {
             // REX::INFO("Npc is null");

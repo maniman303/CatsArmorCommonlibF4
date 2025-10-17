@@ -10,6 +10,12 @@ namespace Setup
 	std::map<int, uint16_t> WorkaroundMap;
 	RE::SpellItem* Spell;
 	RE::BGSPerk* Perk;
+	bool isInitialized = false;
+
+	bool IsInitialized()
+	{
+		return isInitialized;
+	}
 
 	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword)
 	{
@@ -237,6 +243,8 @@ namespace Setup
 
 	bool Initialize()
 	{
+		isInitialized = false;
+		
 		auto path = Files::GetPluginPath().append("Setup");
 		auto filePath = path.append("Setup.json");
 
@@ -291,7 +299,13 @@ namespace Setup
 			REX::WARN("Missing setup for headgear.");
 		}
 
-		LoadSpellAndPerk(setupJson);
+		if (!LoadSpellAndPerk(setupJson))
+		{
+			REX::WARN("Missing setup for spell and perk.");
+			result = false;
+		}
+
+		isInitialized = result;
 
 		LoadWorkaround(setupJson);
 

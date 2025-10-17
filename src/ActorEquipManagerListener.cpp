@@ -1,6 +1,8 @@
 #include "ActorEquipManagerListener.h"
 #include "PerkDistributor.h"
 #include "PapyrusUtil.h"
+#include "Setup.h"
+#include "Files.h"
 
 class ActorEquipManagerSink : public RE::BSTEventSink<RE::ActorEquipManagerEvent::Event>
 {
@@ -70,6 +72,11 @@ private:
 
     RE::BSEventNotifyControl ProcessEvent(const RE::ActorEquipManagerEvent::Event& aEvent, RE::BSTEventSource<RE::ActorEquipManagerEvent::Event>*) override
     {
+        if (!Files::IsFilePresent() || !Setup::IsInitialized())
+        {
+            return RE::BSEventNotifyControl::kContinue;
+        }
+
         auto actor = aEvent.actorAffected;
         auto itemInstance = aEvent.itemAffected;
 

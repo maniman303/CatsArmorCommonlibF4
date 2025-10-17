@@ -2,6 +2,13 @@
 
 namespace Files
 {
+	bool isFilePresent = false;
+
+	bool IsFilePresent()
+	{
+		return isFilePresent;
+	}
+
 	std::filesystem::path GetRootPath()
 	{
 		auto workingDir = std::filesystem::current_path();
@@ -30,6 +37,8 @@ namespace Files
 
 	bool VerifyScatPlugin()
 	{
+		isFilePresent = false;
+
 		RE::TESDataHandler* dh = RE::TESDataHandler::GetSingleton();
 		auto modIndexOpt = dh->GetLoadedLightModIndex("Scat Armor.esl");
 
@@ -40,6 +49,8 @@ namespace Files
 		if (modIndexOpt.value() == 0) {
 			return false;
 		}
+
+		isFilePresent = true;
 
 		return true;
 	}

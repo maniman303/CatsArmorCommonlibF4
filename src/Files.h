@@ -8,6 +8,8 @@
 
 namespace Files
 {
+	bool IsFilePresent();
+
 	std::filesystem::path GetRootPath();
 
 	std::filesystem::path GetPluginPath();

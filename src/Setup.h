@@ -6,6 +6,8 @@
 
 namespace Setup
 {
+	bool IsInitialized();
+
 	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword);
 
 	class TypedSetup
