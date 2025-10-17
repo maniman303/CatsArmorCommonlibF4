@@ -2,15 +2,6 @@
 
 namespace PapyrusUtil
 {
-	void AddItem(
-		RE::TESObjectREFR* a_ref,
-		RE::TESObjectREFR* a_form,
-		std::int32_t a_count,
-		bool a_silent)
-	{
-		PapyrusUtil::CallPapyrusFunctionOnForm(a_ref, "ObjectReference", "AddItem", a_form, a_count, a_silent);
-	}
-
 	std::vector<int> GetArmorBipedSlots(std::monostate, RE::TESObjectARMO* armor)
 	{
 		std::vector<int> result;

@@ -22,7 +22,7 @@ namespace PerkDistributor
         return IsRaceOfHumanOrigin(armorRace);
     }
 
-    bool IsNpcValid(RE::TESNPC* npc)
+    bool IsNpcValid(RE::TESNPC* npc, bool excludePlayer)
     {
         if (npc == NULL)
         {
@@ -30,7 +30,7 @@ namespace PerkDistributor
             return false;
         }
 
-        if (npc->IsPlayer() || npc->IsDeleted())
+        if ((npc->IsPlayer() && !excludePlayer) || npc->IsDeleted())
         {
             // REX::INFO("Npc doesn't match criteria... [{}]", npc->GetFullName());
             return false;
@@ -44,6 +44,11 @@ namespace PerkDistributor
         }
 
         return true;
+    }
+
+    bool IsNpcValid(RE::TESNPC* npc)
+    {
+        return IsNpcValid(npc, true);
     }
 
     bool TryProcessNpc(RE::TESNPC* npc)
