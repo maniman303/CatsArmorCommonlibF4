@@ -8,8 +8,8 @@
 namespace Setup
 {
 	std::map<int, uint16_t> WorkaroundMap;
-	RE::SpellItem* Spell;
-	RE::BGSPerk* Perk;
+	RE::SpellItem* Spell = NULL;
+	RE::BGSPerk* Perk = NULL;
 	bool isInitialized = false;
 
 	bool IsInitialized()
