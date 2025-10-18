@@ -42,9 +42,9 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 
 		Files::PrepareDirectories();
 
-		if (!Files::VerifyScatPlugin())
+		if (!Files::VerifyCatsPlugin())
 		{
-			REX::ERROR("Plugin 'Scat Armor.esl' is missing.");
+			REX::ERROR("Plugin 'Cats Armor.esl' is missing.");
 			return;
 		}
 
@@ -67,8 +67,8 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 
 bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
 {
-	vm->BindNativeMethod("SCAT:ScriptExtender", "GetArmorBipedSlots", PapyrusUtil::GetArmorBipedSlots, true);
-	vm->BindNativeMethod("SCAT:ScriptExtender", "Trace", PapyrusUtil::LogScript, true);
+	vm->BindNativeMethod("CATS:ScriptExtender", "GetArmorBipedSlots", PapyrusUtil::GetArmorBipedSlots, true);
+	vm->BindNativeMethod("CATS:ScriptExtender", "Trace", PapyrusUtil::LogScript, true);
 
 	return true;
 }

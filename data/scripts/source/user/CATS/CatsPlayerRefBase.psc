@@ -1,4 +1,4 @@
-Scriptname SCAT:ScatPlayerRefBase extends ReferenceAlias Native Const Hidden
+Scriptname CATS:CatsPlayerRefBase extends ReferenceAlias Native Const Hidden
 
 Function RegisterForHeadgearEquipEvent()
 	RegisterForExternalEvent("HeadgearEquipEvent", "OnHeadgearEquipEvent")

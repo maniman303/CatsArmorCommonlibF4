@@ -5,7 +5,7 @@ set_xmakever("2.8.2")
 includes("lib/commonlibf4")
 
 -- set project
-set_project("ScatArmorPlugin")
+set_project("CatsArmorPlugin")
 set_version("1.0.0")
 set_license("GPL-3.0")
 
@@ -24,15 +24,15 @@ add_rules("plugin.vsxmake.autoupdate")
 add_requires("jsoncpp")
 
 -- targets
-target("ScatArmorPlugin")
+target("CatsArmorPlugin")
     -- add dependencies to target
     add_deps("commonlibf4")
 
     -- add commonlibsse plugin
     add_rules("commonlibf4.plugin", {
-        name = "ScatArmorPlugin",
+        name = "CatsArmorPlugin",
         author = "maniman303",
-        description = "F4SE plugin for Scat armor"
+        description = "F4SE plugin for cats armor"
     })
 
     -- add src files

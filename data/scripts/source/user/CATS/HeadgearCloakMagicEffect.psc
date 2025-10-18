@@ -1,9 +1,9 @@
-Scriptname SCAT:HeadgearCloakMagicEffect extends ActiveMagicEffect
+Scriptname CATS:HeadgearCloakMagicEffect extends ActiveMagicEffect
 
 Perk Property HeadgearPerk Auto Const
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
-    SCAT:ScriptExtender.Trace("Found target: " + akTarget.GetDisplayName())
+    CATS:ScriptExtender.Trace("Found target: " + akTarget.GetDisplayName())
 
     if (!akTarget.HasPerk(HeadgearPerk))
         akTarget.AddPerk(HeadgearPerk)

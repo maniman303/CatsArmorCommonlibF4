@@ -1,4 +1,4 @@
-Scriptname SCAT:ScriptExtender Native
+Scriptname CATS:ScriptExtender Native
 
 int[] Function GetArmorBipedSlots(Armor armorForm) native global
 

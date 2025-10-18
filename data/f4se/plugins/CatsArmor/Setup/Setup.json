@@ -1,0 +1,40 @@
+{
+	"torso": {
+		"keywordToAdd": "Cats Armor.esl|E",
+		"attachSlotToAdd": "Cats Armor.esl|1A",
+		"armorAddon": "Cats Armor.esl|6"
+	},
+	"leftArm": {
+		"keywordToAdd": "Cats Armor.esl|F",
+		"attachSlotToAdd": "Cats Armor.esl|1B",
+		"armorAddon": "Cats Armor.esl|2"
+	},
+	"rightArm": {
+		"keywordToAdd": "Cats Armor.esl|10",
+		"attachSlotToAdd": "Cats Armor.esl|1C",
+		"armorAddon": "Cats Armor.esl|3"
+	},
+	"leftLeg": {
+		"keywordToAdd": "Cats Armor.esl|11",
+		"attachSlotToAdd": "Cats Armor.esl|1D",
+		"armorAddon": "Cats Armor.esl|4"
+	},
+	"rightLeg": {
+		"keywordToAdd": "Cats Armor.esl|12",
+		"attachSlotToAdd": "Cats Armor.esl|1E",
+		"armorAddon": "Cats Armor.esl|5"
+	},
+	"headgear": {
+		"enabled": true,
+		"keywordToAdd": "Cats Armor.esl|13",
+		"attachSlotToAdd": "Cats Armor.esl|1F",
+		"armorAddon": "Cats Armor.esl|7",
+		"keywordHairLong": "Cats Armor.esl|21",
+		"keywordHairTop": "Cats Armor.esl|20",
+		"keywordHairBeard": "Cats Armor.esl|22",
+	},
+	"magic": {
+		"spell": "Cats Armor.esl|45",
+		"perk": "Cats Armor.esl|49"
+	}
+}

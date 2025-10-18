@@ -22,7 +22,7 @@ namespace Files
 	{
 		auto rootDir = Files::GetRootPath();
 		rootDir.append("Plugins");
-		rootDir.append("ScatArmor");
+		rootDir.append("CatsArmor");
 
 		return rootDir;
 	}
@@ -35,12 +35,12 @@ namespace Files
 		return pathExists;
 	}
 
-	bool VerifyScatPlugin()
+	bool VerifyCatsPlugin()
 	{
 		isFilePresent = false;
 
 		RE::TESDataHandler* dh = RE::TESDataHandler::GetSingleton();
-		auto modIndexOpt = dh->GetLoadedLightModIndex("Scat Armor.esl");
+		auto modIndexOpt = dh->GetLoadedLightModIndex("Cats Armor.esl");
 
 		if (!modIndexOpt.has_value()) {
 			return false;

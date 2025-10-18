@@ -1,5 +1,5 @@
 ;BEGIN FRAGMENT CODE - Do not edit anything between this and the end comment
-Scriptname SCAT:Fragments:Terminals:scat_term_settings Extends Terminal Hidden Const
+Scriptname CATS:Fragments:Terminals:cats_term_settings Extends Terminal Hidden Const
 
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)

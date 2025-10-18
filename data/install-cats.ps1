@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-  Create symlinks for Scat Armor files into a Fallout 4 Data folder.
+  Create symlinks for Cats Armor files into a Fallout 4 Data folder.
   Requires admin privileges unless Developer Mode is enabled.
 
 .PARAMETER TargetPath
   Destination Data folder, e.g. "D:\SteamLibrary\steamapps\common\Fallout 4\Data"
 
 .EXAMPLE
-  .\install-scat.ps1 -TargetPath 'D:\SteamLibrary\steamapps\common\Fallout 4\Data'
+  .\install-cats.ps1 -TargetPath 'D:\SteamLibrary\steamapps\common\Fallout 4\Data'
 #>
 
 param(
@@ -49,12 +49,12 @@ $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyI
 Write-Host "Script directory: $ScriptDir"
 
 # Source items
-$srcMeshes = Join-Path $ScriptDir 'meshes\armor\ScatArmor'
-$srcScripts = Join-Path $ScriptDir 'scripts\source\user\SCAT'
+$srcMeshes = Join-Path $ScriptDir 'meshes\armor\CatsArmor'
+$srcScripts = Join-Path $ScriptDir 'scripts\source\user\CATS'
 
 # Destination items
-$dstMeshes = Join-Path $TargetPath 'meshes\armor\ScatArmor'
-$dstScripts = Join-Path $TargetPath 'scripts\source\user\SCAT'
+$dstMeshes = Join-Path $TargetPath 'meshes\armor\CatsArmor'
+$dstScripts = Join-Path $TargetPath 'scripts\source\user\CATS'
 
 Write-Host "Will create symlinks:"
 Write-Host "  Meshes:  $dstMeshes -> $srcMeshes"

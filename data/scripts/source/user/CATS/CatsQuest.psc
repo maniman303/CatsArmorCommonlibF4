@@ -1,4 +1,4 @@
-Scriptname SCAT:GivePlayerHolotape extends Quest
+Scriptname CATS:CatsQuest extends Quest
 
 GlobalVariable Property IsModLoaded Auto Const
 
@@ -7,7 +7,7 @@ Worldspace Property PrewarWorldspace Auto Const
 Form[] Property GiveItems Auto Const
 { Add any items you want to give the player when it is safe to do so. This will occur either immediately after the mod is installed, or if they start a new game, it will delay unil after they have a pipboy. }
 
-ObjectMod[] Property ScatMods Auto Const
+ObjectMod[] Property CatsMods Auto Const
 { Array of hidden mods: Torso, Arm Left, Arm Right, Leg Left, Leg Right }
 
 Keyword Property HeadgearHiddenKey Auto Const
@@ -49,7 +49,7 @@ Function TryToGiveItems()
 
 	Worldspace playerWorldspace = player.GetWorldspace()
 	if (playerWorldspace == PrewarWorldspace || PlayerWorldspace == None)
-		; SCAT:ScriptExtender.Trace("Registered player teleport.")
+		; CATS:ScriptExtender.Trace("Registered player teleport.")
 		RegisterForPlayerTeleport()
 	else
 		if (IsModLoaded.GetValueInt() == 1)
@@ -58,7 +58,7 @@ Function TryToGiveItems()
 
 		IsModLoaded.SetValueInt(1)
 
-		SCAT:ScriptExtender.Trace("Distribute items.")
+		CATS:ScriptExtender.Trace("Distribute items.")
 		UnregisterForPlayerTeleport()
 		
 		int i = 0
@@ -110,30 +110,30 @@ Function TransformArmorPiece(int modIndex, bool shouldRemove)
 	endIf
 
 	if baseObject == None
-		Debug.Notification("SCAT: Selected armor type " + bipedIndex + " is not equipped")
-		SCAT:ScriptExtender.Trace("Selected armor type " + bipedIndex + " is not equipped.")
+		Debug.Notification("CATS: Selected armor type " + bipedIndex + " is not equipped")
+		CATS:ScriptExtender.Trace("Selected armor type " + bipedIndex + " is not equipped.")
 		return
 	endIf
 	
 	Actor player = Game.GetPlayer()
 
 	if !player.IsEquipped(baseObject)
-		Debug.Notification("SCAT: " + baseObject.GetName() + " is not equipped")
-		SCAT:ScriptExtender.Trace(baseObject.GetName() + " is not equipped.")
+		Debug.Notification("CATS: " + baseObject.GetName() + " is not equipped")
+		CATS:ScriptExtender.Trace(baseObject.GetName() + " is not equipped.")
 		return
 	endif
 	
 	int itemCount = player.GetItemCount(baseObject)
 	
 	if itemCount > 1
-		Debug.Notification("SCAT: You have too many " + baseObject.GetName())
-		SCAT:ScriptExtender.Trace("You have too many " + baseObject.GetName() + ".")
+		Debug.Notification("CATS: You have too many " + baseObject.GetName())
+		CATS:ScriptExtender.Trace("You have too many " + baseObject.GetName() + ".")
 		return
 	endIf
 
 	player.UnequipItem(baseObject, abSilent = true)
 	
-	ObjectMod pieceMod = ScatMods[modIndex]
+	ObjectMod pieceMod = CatsMods[modIndex]
 	if shouldRemove
 		player.RemoveModFromInventoryItem(baseObject, pieceMod)
 	else
@@ -159,7 +159,7 @@ Form Function GetEquippedHeadgear()
 		index = index + 1
 	endWhile
 	
-	; SCAT:ScriptExtender.Trace("Found headgear at index: " + slots[index - 1] + ".")
+	; CATS:ScriptExtender.Trace("Found headgear at index: " + slots[index - 1] + ".")
 
 	return item
 EndFunction
@@ -187,8 +187,8 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 	bool res = false
     bool isHidden = akTarget.WornHasKeyword(HeadgearHiddenKey)
 
-    ;SCAT:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
-	;SCAT:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] IsHidden: " + isHidden)
+    ;CATS:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
+	;CATS:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] IsHidden: " + isHidden)
 
     if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
 		res = res || !akTarget.IsEquipped(HairLong)
@@ -215,7 +215,7 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
     endif
 
     if (checkAbility && HeadgearAbility != NONE && akTarget.HasSpell(HeadgearAbility))
-        ; SCAT:ScriptExtender.Trace("Removing one shot ability.")
+        ; CATS:ScriptExtender.Trace("Removing one shot ability.")
         akTarget.RemoveSpell(HeadgearAbility)
     endif
 	
@@ -228,7 +228,7 @@ Function UpdateHeadgearOfNearbyActors(int actorFormId)
 	
 	int actorsLength = kActors.length
 	
-	;SCAT:ScriptExtender.Trace("Found " + actorsLength + " actors")
+	;CATS:ScriptExtender.Trace("Found " + actorsLength + " actors")
 	
 	int i = 0
 	while i < actorsLength
@@ -237,7 +237,7 @@ Function UpdateHeadgearOfNearbyActors(int actorFormId)
 			Actor npc = object as Actor
 			if (npc.GetFormID() == actorFormId && ValidateHeadgearHair(npc, false))
 				npc.QueueUpdate(true, 0xC)
-				; SCAT:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
+				; CATS:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
 			endif
 		endif
 		

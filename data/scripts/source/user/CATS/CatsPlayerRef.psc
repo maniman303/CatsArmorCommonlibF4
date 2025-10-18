@@ -1,6 +1,6 @@
-Scriptname SCAT:ScatPlayerRef extends SCAT:ScatPlayerRefBase
+Scriptname CATS:CatsPlayerRef extends CATS:CatsPlayerRefBase
 
-Quest Property ScatQuest Auto Const
+Quest Property CatsQuest Auto Const
 
 Perk Property HeadgearPerk Auto Const
 
@@ -13,9 +13,9 @@ Event OnPlayerLoadGame()
 EndEvent
 
 Function InitPlayer()
-	(ScatQuest as SCAT:GivePlayerHolotape).TryToGiveItems()
+	(CatsQuest as CATS:CatsQuest).TryToGiveItems()
 	
-	SCAT:ScriptExtender.Trace("Player loaded the game.")
+	CATS:ScriptExtender.Trace("Player loaded the game.")
 	
 	RegisterForHeadgearEquipEvent()
 EndFunction
@@ -29,7 +29,7 @@ Event OnHeadgearEquipEvent(int actorFormId)
 	; 	return
 	; endif
 
-	; SCAT:ScriptExtender.Trace("Received HeadgearEquipEvent [" + actorFormId + "].")
+	; CATS:ScriptExtender.Trace("Received HeadgearEquipEvent [" + actorFormId + "].")
 	
-	(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors(actorFormId)
+	(CatsQuest as CATS:CatsQuest).UpdateHeadgearOfNearbyActors(actorFormId)
 EndEvent

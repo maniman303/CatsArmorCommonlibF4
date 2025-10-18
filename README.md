@@ -1,4 +1,4 @@
-# Scat Armor plugin
+# Cats Armor plugin
 
 This is a basic plugin template using CommonLibF4.
 
@@ -8,8 +8,8 @@ This is a basic plugin template using CommonLibF4.
 
 ## Getting Started
 ```bat
-git clone --recurse-submodules https://github.com/maniman303/ScatArmorCommonlibF4.git
-cd ScatArmorCommonlibF4
+git clone --recurse-submodules https://github.com/maniman303/CatsArmorCommonlibF4.git
+cd CatsArmorCommonlibF4
 ```
 
 ### Build

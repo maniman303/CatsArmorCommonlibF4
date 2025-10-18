@@ -16,7 +16,7 @@ namespace Files
 
 	bool VerifyPaths();
 
-	bool VerifyScatPlugin();
+	bool VerifyCatsPlugin();
 
 	std::vector<std::filesystem::directory_entry> GetPluginFiles(std::string path);
 
