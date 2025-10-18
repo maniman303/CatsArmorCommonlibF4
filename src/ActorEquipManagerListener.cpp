@@ -57,6 +57,11 @@ private:
 			RE::TESObjectREFR* arg;
 		};
 
+        if (arg == NULL)
+        {
+            return;
+        }
+
 		PapyrusEventData evntData;
 		auto const papyrus = F4SE::GetPapyrusInterface();
 		auto* vm = RE::GameVM::GetSingleton()->GetVM().get();
@@ -66,7 +71,7 @@ private:
 
 		papyrus->GetExternalEventRegistrations("HeadgearEquipEvent", &evntData, [](uint64_t handle, const char* scriptName, const char* callbackName, void* dataPtr) {
 			PapyrusEventData* d = static_cast<PapyrusEventData*>(dataPtr);
-			d->vm->DispatchMethodCall(handle, scriptName, callbackName, NULL);
+			d->vm->DispatchMethodCall(handle, scriptName, callbackName, NULL, d->arg->GetFormID());
 		});
 	}
 

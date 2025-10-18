@@ -4,4 +4,4 @@ Function RegisterForHeadgearEquipEvent()
 	RegisterForExternalEvent("HeadgearEquipEvent", "OnHeadgearEquipEvent")
 EndFunction
 
-Event OnHeadgearEquipEvent() native
+Event OnHeadgearEquipEvent(int actorFormId) native

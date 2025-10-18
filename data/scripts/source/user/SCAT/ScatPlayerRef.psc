@@ -20,7 +20,7 @@ Function InitPlayer()
 	RegisterForHeadgearEquipEvent()
 EndFunction
 
-Event OnHeadgearEquipEvent()
+Event OnHeadgearEquipEvent(int actorFormId)
 	; if (aTarget == None)
 	; 	return
 	; endif
@@ -29,9 +29,7 @@ Event OnHeadgearEquipEvent()
 	; 	return
 	; endif
 
-	SCAT:ScriptExtender.Trace("Received HeadgearEquipEvent.")
+	; SCAT:ScriptExtender.Trace("Received HeadgearEquipEvent [" + actorFormId + "].")
 	
-	; (ScatQuest as SCAT:GivePlayerHolotape).ValidateHeadgearHair(aTarget as Actor, false)
-	
-	(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors()
+	(ScatQuest as SCAT:GivePlayerHolotape).UpdateHeadgearOfNearbyActors(actorFormId)
 EndEvent

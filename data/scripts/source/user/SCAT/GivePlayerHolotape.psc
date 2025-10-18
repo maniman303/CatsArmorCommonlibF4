@@ -222,11 +222,7 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 	return res
 EndFunction
 
-Function UpdateHeadgearOfNearbyActors(Form akBaseItem = None)
-	if (akBaseItem != None && !akBaseItem.HasKeyword(HeadgearKey))
-		return
-	endif
-
+Function UpdateHeadgearOfNearbyActors(int actorFormId)
 	Actor Player = Game.GetPlayer()
 	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorTypeNPC, 360)
 	
@@ -239,9 +235,9 @@ Function UpdateHeadgearOfNearbyActors(Form akBaseItem = None)
 		ObjectReference object = kActors[i]
 		if (object is Actor)
 			Actor npc = object as Actor
-			;SCAT:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
-			if (ValidateHeadgearHair(npc, false))
+			if (npc.GetFormID() == actorFormId && ValidateHeadgearHair(npc, false))
 				npc.QueueUpdate(true, 0xC)
+				; SCAT:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
 			endif
 		endif
 		
