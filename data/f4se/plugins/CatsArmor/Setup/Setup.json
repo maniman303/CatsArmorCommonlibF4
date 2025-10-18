@@ -36,5 +36,6 @@
 	"magic": {
 		"spell": "Cats Armor.esl|45",
 		"perk": "Cats Armor.esl|49"
-	}
+	},
+	"actorProcessing": "Cats Armor.esl|4F"
 }

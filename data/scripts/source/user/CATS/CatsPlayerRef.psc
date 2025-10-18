@@ -31,5 +31,5 @@ Event OnHeadgearEquipEvent(int actorFormId)
 
 	; CATS:ScriptExtender.Trace("Received HeadgearEquipEvent [" + actorFormId + "].")
 	
-	(CatsQuest as CATS:CatsQuest).UpdateHeadgearOfNearbyActors(actorFormId)
+	(CatsQuest as CATS:CatsQuest).UpdateHeadgearOfNearbyActors()
 EndEvent

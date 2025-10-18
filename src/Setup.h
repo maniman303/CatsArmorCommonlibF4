@@ -36,6 +36,8 @@ namespace Setup
 
 	RE::BGSPerk* GetPerk();
 
+	RE::BGSKeyword* GetActorKeyword();
+
 	bool LoadTypedSetup(Json::Value setup, std::string type);
 
 	void LoadWorkaround(Json::Value setup);

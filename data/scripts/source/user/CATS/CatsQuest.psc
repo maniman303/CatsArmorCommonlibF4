@@ -30,7 +30,7 @@ Spell Property HeadgearAbility Auto Const
 
 Perk Property HeadgearPerk Auto Const
 
-Keyword Property ActorTypeNPC Auto Const
+Keyword Property ActorProcessing Auto Const
 
 Event OnQuestInit()
 	TryToGiveItems()
@@ -222,9 +222,9 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 	return res
 EndFunction
 
-Function UpdateHeadgearOfNearbyActors(int actorFormId)
+Function UpdateHeadgearOfNearbyActors()
 	Actor Player = Game.GetPlayer()
-	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorTypeNPC, 360)
+	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorProcessing, 450)
 	
 	int actorsLength = kActors.length
 	
@@ -235,7 +235,9 @@ Function UpdateHeadgearOfNearbyActors(int actorFormId)
 		ObjectReference object = kActors[i]
 		if (object is Actor)
 			Actor npc = object as Actor
-			if (npc.GetFormID() == actorFormId && ValidateHeadgearHair(npc, false))
+			npc.RemoveKeyword(ActorProcessing)
+			
+			if (ValidateHeadgearHair(npc, false))
 				npc.QueueUpdate(true, 0xC)
 				; CATS:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
 			endif

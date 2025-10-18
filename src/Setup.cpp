@@ -10,11 +10,12 @@ namespace Setup
 	std::map<int, uint16_t> WorkaroundMap;
 	RE::SpellItem* Spell = NULL;
 	RE::BGSPerk* Perk = NULL;
-	bool isInitialized = false;
+	RE::BGSKeyword* ActorKywd = NULL;
+	bool IsInitializedFlag = false;
 
 	bool IsInitialized()
 	{
-		return isInitialized;
+		return IsInitializedFlag;
 	}
 
 	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword)
@@ -92,6 +93,11 @@ namespace Setup
 	RE::BGSPerk* GetPerk()
 	{
 		return Perk;
+	}
+
+	RE::BGSKeyword* GetActorKeyword()
+	{
+		return ActorKywd;
 	}
 
 	bool LoadTypedSetup(Json::Value setup, std::string type)
@@ -202,6 +208,29 @@ namespace Setup
 		return true;
 	}
 
+	bool LoadActorKeyword(Json::Value setup)
+	{
+		ActorKywd = NULL;
+
+		auto actorSetup = setup["actorProcessing"];
+
+		if (actorSetup.empty()) {
+			return false;
+		}
+
+		auto form = FormUtil::GetFormFromJson(actorSetup, RE::ENUM_FORM_ID::kKYWD);
+
+		if (form == NULL) {
+			return false;
+		}
+
+		auto kywd = form->As<RE::BGSKeyword>();
+
+		ActorKywd = kywd;
+
+		return true;
+	}
+
 	void LoadWorkaround(Json::Value setup)
 	{
 		auto workaroundSetup = setup["workaround"];
@@ -243,7 +272,7 @@ namespace Setup
 
 	bool Initialize()
 	{
-		isInitialized = false;
+		IsInitializedFlag = false;
 		
 		auto path = Files::GetPluginPath().append("Setup");
 		auto filePath = path.append("Setup.json");
@@ -305,7 +334,13 @@ namespace Setup
 			result = false;
 		}
 
-		isInitialized = result;
+		if (!LoadActorKeyword(setupJson))
+		{
+			REX::WARN("Missing setup for actor processing.");
+			result = false;
+		}
+
+		IsInitializedFlag = result;
 
 		LoadWorkaround(setupJson);
 

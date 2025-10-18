@@ -49,7 +49,7 @@ private:
         return armor;
     }
 
-    void SendPapyrusEvent(RE::TESObjectREFR* arg)
+    void SendHeadgearPapyrusEvent(RE::TESObjectREFR* objectRef)
 	{
 		struct PapyrusEventData
 		{
@@ -57,19 +57,27 @@ private:
 			RE::TESObjectREFR* arg;
 		};
 
-        if (arg == NULL)
+        if (objectRef == NULL)
         {
             return;
         }
 
-		PapyrusEventData evntData;
+        auto kywd = Setup::GetActorKeyword();
+        if (kywd == NULL)
+        {
+            return;
+        }
+
+        objectRef->AddKeyword(kywd);
+
+		PapyrusEventData eventData;
 		auto const papyrus = F4SE::GetPapyrusInterface();
 		auto* vm = RE::GameVM::GetSingleton()->GetVM().get();
 
-		evntData.vm = vm;
-		evntData.arg = arg;
+		eventData.vm = vm;
+		eventData.arg = objectRef;
 
-		papyrus->GetExternalEventRegistrations("HeadgearEquipEvent", &evntData, [](uint64_t handle, const char* scriptName, const char* callbackName, void* dataPtr) {
+		papyrus->GetExternalEventRegistrations("HeadgearEquipEvent", &eventData, [](uint64_t handle, const char* scriptName, const char* callbackName, void* dataPtr) {
 			PapyrusEventData* d = static_cast<PapyrusEventData*>(dataPtr);
 			d->vm->DispatchMethodCall(handle, scriptName, callbackName, NULL, d->arg->GetFormID());
 		});
@@ -109,7 +117,7 @@ private:
 
         // REX::INFO("Send headgear event");
 
-        SendPapyrusEvent(actor);
+        SendHeadgearPapyrusEvent(actor);
 
         return RE::BSEventNotifyControl::kContinue;
     }
