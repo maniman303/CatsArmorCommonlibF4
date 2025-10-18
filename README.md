@@ -1,6 +1,6 @@
 # Cats Armor plugin
 
-This is a basic plugin template using CommonLibF4.
+This is a Cats Armor plugin, responsible for dynamic patching of armors, and perk and spell distribution onto NPCs.
 
 ### Requirements
 * [XMake](https://xmake.io) [2.8.2+]
