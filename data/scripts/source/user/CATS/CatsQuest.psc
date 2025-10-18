@@ -168,11 +168,13 @@ Form Function GetEquippedArmor(int index)
 	Actor player = Game.GetPlayer()
 	Actor:WornItem item = player.GetWornItem(index)
 	
-	if item == None
+	if item == None || item.Item == None
+		;CATS:ScriptExtender.Trace("Item is none.")
 		return None
 	endIf
 	
-	if !item.Item is Armor
+	if !(item.Item is Armor)
+		;CATS:ScriptExtender.Trace("Item is not armor.")
 		return None
 	endIf
 	
