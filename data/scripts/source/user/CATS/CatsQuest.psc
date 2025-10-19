@@ -224,6 +224,19 @@ bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
 	return res
 EndFunction
 
+Actor Function GetValidActor(ObjectReference aTarget)
+	if (aTarget == None || !(aTarget is Actor))
+		return None
+	endIf
+	
+	Actor npc = aTarget as Actor
+	if (npc.IsDeleted() || npc.IsDisabled())
+		return None
+	endIf
+	
+	return npc
+EndFunction
+
 Function UpdateHeadgearOfNearbyActors()
 	Actor Player = Game.GetPlayer()
 	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorProcessing, 450)
@@ -234,9 +247,8 @@ Function UpdateHeadgearOfNearbyActors()
 	
 	int i = 0
 	while i < actorsLength
-		ObjectReference object = kActors[i]
-		if (object is Actor)
-			Actor npc = object as Actor
+		Actor npc = GetValidActor(kActors[i])
+		if (npc != None)
 			npc.RemoveKeyword(ActorProcessing)
 			
 			if (ValidateHeadgearHair(npc, false))
