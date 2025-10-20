@@ -118,7 +118,7 @@ Function TransformArmorPiece(int modIndex, bool shouldRemove)
 	Actor player = Game.GetPlayer()
 
 	if !player.IsEquipped(baseObject)
-		CATS:CatsDebug.Notification("CATS: " + baseObject.GetName() + " is not equipped")
+		CATS:ScriptExtender.Notification("CATS: " + baseObject.GetName() + " is not equipped")
 		CATS:ScriptExtender.Trace(baseObject.GetName() + " is not equipped.")
 		return
 	endif
@@ -126,7 +126,7 @@ Function TransformArmorPiece(int modIndex, bool shouldRemove)
 	int itemCount = player.GetItemCount(baseObject)
 	
 	if itemCount > 1
-		CATS:CatsDebug.Notification("CATS: You have too many " + baseObject.GetName())
+		CATS:ScriptExtender.Notification("CATS: You have too many " + baseObject.GetName())
 		CATS:ScriptExtender.Trace("You have too many " + baseObject.GetName() + ".")
 		return
 	endIf

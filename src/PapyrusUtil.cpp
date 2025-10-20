@@ -29,4 +29,20 @@ namespace PapyrusUtil
 
 		REX::INFO(std::format("[Script] {0}", text));
 	}
+
+	void Notification(std::monostate, RE::BSFixedString message)
+	{
+		auto vm = RE::GameVM::GetSingleton()->GetVM().get();
+
+		vm->DispatchStaticCall("Debug", "Notification", NULL, message);
+	}
+
+	bool BindFunctions(RE::BSScript::IVirtualMachine* vm)
+	{
+		vm->BindNativeMethod("CATS:ScriptExtender", "GetArmorBipedSlots", PapyrusUtil::GetArmorBipedSlots, true);
+		vm->BindNativeMethod("CATS:ScriptExtender", "Trace", PapyrusUtil::LogScript, true);
+		vm->BindNativeMethod("CATS:ScriptExtender", "Notification", PapyrusUtil::Notification);
+
+		return true;
+	}
 }

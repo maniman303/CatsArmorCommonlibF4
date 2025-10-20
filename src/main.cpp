@@ -65,21 +65,13 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 	}
 }
 
-bool BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
-{
-	vm->BindNativeMethod("CATS:ScriptExtender", "GetArmorBipedSlots", PapyrusUtil::GetArmorBipedSlots, true);
-	vm->BindNativeMethod("CATS:ScriptExtender", "Trace", PapyrusUtil::LogScript, true);
-
-	return true;
-}
-
 F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 {
 	F4SE::Init(a_f4se, { .trampoline = true });
 
 	InitModCore(a_f4se);
 	
-	F4SE::GetPapyrusInterface()->Register(BindPapyrusFunctions);
+	F4SE::GetPapyrusInterface()->Register(PapyrusUtil::BindFunctions);
 
 	F4SE::GetMessagingInterface()->RegisterListener(OnMessage);
 

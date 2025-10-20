@@ -4,6 +4,8 @@ int[] Function GetArmorBipedSlots(Armor armorForm) native global
 
 Function Trace(String message) native global
 
+Function Notification(String message) native global
+
 Function AddItemsFormList(FormList fList) global
 	if (fList == None)
 		return
