@@ -125,8 +125,7 @@ private:
 
 void ActorEquipManagerListener::Register()
 {
-    auto *mgr = RE::ActorEquipManager::GetSingleton();
-
+    auto mgr = RE::ActorEquipManager::GetSingleton();
     if (mgr == NULL)
     {
         REX::WARN("ActorEquipManager is null.");
@@ -134,7 +133,16 @@ void ActorEquipManagerListener::Register()
         return;
     }
 
-    mgr->RegisterSink(ActorEquipManagerSink::GetSingleton());
+    auto sink = ActorEquipManagerSink::GetSingleton();
+    if (sink == NULL)
+    {
+        REX::WARN("ActorEquipManagerSink is null.");
+
+        return;
+    }
+
+    mgr->UnregisterSink(sink);
+    mgr->RegisterSink(sink);
 
     REX::INFO("ActorEquipManager event listener registered.");
 }
