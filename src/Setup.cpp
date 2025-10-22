@@ -33,14 +33,14 @@ namespace Setup
 		return 0;
 	}
 
-	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa, RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb)
+	TypedSetup::TypedSetup(int bi, RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa, RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb)
 	{
 		keyword = kw;
 		attachSlot = as;
 		armorAddon = aa;
 		isEmpty = false;
 		isEnabled = true;
-		bipedIndex = 58,
+		bipedIndex = bi,
 		keywordHairLong = kwHl;
 		keywordHairTop = kwHt;
 		keywordHairBeard = kwHb;
@@ -53,7 +53,7 @@ namespace Setup
 		armorAddon = aa;
 		isEmpty = false;
 		isEnabled = true;
-		bipedIndex = 58;
+		bipedIndex = DefaultBipedIndex;
 		keywordHairLong = NULL;
 		keywordHairTop = NULL;
 		keywordHairBeard = NULL;
@@ -66,7 +66,7 @@ namespace Setup
 		armorAddon = NULL;
 		isEmpty = true;
 		isEnabled = false;
-		bipedIndex = 58;
+		bipedIndex = DefaultBipedIndex;
 		keywordHairLong = NULL;
 		keywordHairTop = NULL;
 		keywordHairBeard = NULL;
@@ -137,9 +137,17 @@ namespace Setup
 			return false;
 		}
 
-		if (typedSetup["enabled"].empty() || !typedSetup["enabled"].isBool() || !typedSetup["enabled"].asBool()) {
+		auto enabledSetup = typedSetup["enabled"];
+		if (!enabledSetup.empty() && enabledSetup.isBool() && !enabledSetup.asBool()) {
 			REX::WARN("Json setup is disabled.");
 			return false;
+		}
+
+		int bipedIndex = DefaultBipedIndex;
+		auto bipedIndexSetup = typedSetup["bipedIndex"];
+		if (!bipedIndexSetup.empty() && bipedIndexSetup.isInt()) {
+			bipedIndex = bipedIndexSetup.asInt();
+			REX::WARN("Custom biped index set to: {}.", bipedIndex);
 		}
 
 		auto keyword = FormUtil::GetFormFromJson(typedSetup["keywordToAdd"], RE::ENUM_FORM_ID::kKYWD);
@@ -172,7 +180,7 @@ namespace Setup
 			return false;
 		}
 
-		SetupMap["headgear"] = TypedSetup(keyword->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>(),
+		SetupMap["headgear"] = TypedSetup(bipedIndex, keyword->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>(),
 			keywordHairLong->As<RE::BGSKeyword>(), keywordHairTop->As<RE::BGSKeyword>(), keywordHairBeard->As<RE::BGSKeyword>());
 
 		return true;
@@ -273,6 +281,8 @@ namespace Setup
 	bool Initialize()
 	{
 		IsInitializedFlag = false;
+
+		SetupMap.clear();
 		
 		auto path = Files::GetPluginPath().append("Setup");
 		auto filePath = path.append("Setup.json");

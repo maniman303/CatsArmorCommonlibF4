@@ -6,9 +6,7 @@
 
 namespace Setup
 {
-	bool IsInitialized();
-
-	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword);
+	static int DefaultBipedIndex = 58;
 
 	class TypedSetup
 	{
@@ -23,12 +21,16 @@ namespace Setup
 		bool isEmpty;
 		bool isEnabled;
 
-		TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa, RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb);
+		TypedSetup(int bi, RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa, RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb);
 
 		TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa);
 
 		TypedSetup();
 	};
+
+	bool IsInitialized();
+
+	uint16_t GetAttachmentParentKeywordIndex(RE::BGSKeyword* keyword);
 
 	TypedSetup GetForms(std::string type);
 
