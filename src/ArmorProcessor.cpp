@@ -9,35 +9,42 @@ namespace ArmorProcessor
 {
 	static void TryModBaseAddonIndex(RE::TESObjectARMO* armor)
 	{
-		if (armor == NULL) {
+		if (armor == NULL)
+		{
 			return;
 		}
 
-		if (armor->armorData.index != 0) {
+		if (armor->armorData.index != 0)
+		{
 			return;
 		}
 
 		bool shouldUpdate = false;
 
-		for (auto& model : armor->modelArray) {
-			if (model.index == 0) {
+		for (auto& model : armor->modelArray) 
+		{
+			if (model.index == 0)
+			{
 				shouldUpdate = true;
 				model.index = 1;
 			}
 		}
 
-		if (shouldUpdate) {
+		if (shouldUpdate)
+		{
 			armor->armorData.index = 1;
 		}
 	}
 
 	static void ProcessArmorForm(RE::TESForm* form, RE::BGSKeyword* keyword, RE::BGSKeyword* attachSlot, RE::TESObjectARMA* addon)
 	{
-		if (form == NULL) {
+		if (form == NULL)
+		{
 			return;
 		}
 
-		if (form->GetFormType() != RE::ENUM_FORM_ID::kARMO) {
+		if (form->GetFormType() != RE::ENUM_FORM_ID::kARMO)
+		{
 			return;
 		}
 
@@ -63,7 +70,8 @@ namespace ArmorProcessor
 
 		addonList.push_back(addonEntry);
 
-		for (auto& ae : armor->modelArray) {
+		for (auto& ae : armor->modelArray)
+		{
 			if (ae.index == 303) {
 				REX::INFO(std::format("Form {0} already has armor addon with index 303.", FormUtil::GetHexFormId(armor->GetFormID())));
 				
@@ -75,7 +83,8 @@ namespace ArmorProcessor
 
 		armor->modelArray.clear();
 
-		for (auto& ae : addonList) {
+		for (auto& ae : addonList)
+		{
 			armor->modelArray.push_back(ae);
 		}
 
@@ -88,22 +97,36 @@ namespace ArmorProcessor
 
 		Json::Value modJson;
 		std::ifstream modFile;
-		modFile.open(path);
+		
+		try
+		{
+			modFile.open(path);
+			modFile >> modJson;
+			modFile.close();
+		}
+		catch (std::exception ex)
+		{
+			REX::ERROR(std::format("Invalid json '{0}'.", path.string()));
+			return;
+		}
 
-		modFile >> modJson;
-
-		modFile.close();
-
-		if (modJson["type"].empty() || !modJson["type"].isString()) {
-			REX::INFO(std::format("File {0} is missing type.", path.string()));
+		if (modJson["type"].empty() || !modJson["type"].isString())
+		{
+			REX::ERROR(std::format("File {0} is missing type.", path.string()));
 			return;
 		}
 
 		auto type = modJson["type"].asString();
+		if (type == "headgear")
+		{
+			return;
+		}
+
 		auto setupForms = Setup::GetForms(type);
 
-		if (setupForms.isEmpty) {
-			REX::INFO(std::format("Missing setup for type: {0}.", type));
+		if (setupForms.isEmpty)
+		{
+			REX::ERROR(std::format("Missing setup for type: {0}.", type));
 			return;
 		}
 
@@ -113,7 +136,9 @@ namespace ArmorProcessor
 
 		auto listBase = FormUtil::GetFormFromJson(modJson["armorList"], RE::ENUM_FORM_ID::kFLST);
 
-		if (keyword == NULL || attachSlot == NULL || addon == NULL || listBase == NULL) {
+		if (keyword == NULL || attachSlot == NULL || addon == NULL || listBase == NULL)
+		{
+			REX::ERROR(std::format("Incomplete entry for {0}.", path.string()));
 			return;
 		}
 
@@ -122,7 +147,8 @@ namespace ArmorProcessor
 		auto filename = path.filename().string();
 		REX::INFO(std::format("Processing '{0}'.", filename));
 
-		for (auto& form : list->arrayOfForms) {
+		for (auto& form : list->arrayOfForms)
+		{
 			ProcessArmorForm(form, keyword, attachSlot, addon);
 		}
 	}
@@ -133,7 +159,8 @@ namespace ArmorProcessor
 
 		REX::INFO(std::format("Retrieved {0} armor files to process.", pluginFiles.size()));
 
-		for (auto& file : pluginFiles) {
+		for (auto& file : pluginFiles)
+		{
 			ProcessArmorEntry(file);
 		}
 	};
