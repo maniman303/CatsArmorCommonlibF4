@@ -104,7 +104,7 @@ namespace ArmorProcessor
 			modFile >> modJson;
 			modFile.close();
 		}
-		catch (std::exception ex)
+		catch (...)
 		{
 			REX::ERROR(std::format("Invalid json '{0}'.", path.string()));
 			return;
@@ -134,20 +134,18 @@ namespace ArmorProcessor
 		auto attachSlot = setupForms.attachSlot;
 		auto addon = setupForms.armorAddon;
 
-		auto listBase = FormUtil::GetFormFromJson(modJson["armorList"], RE::ENUM_FORM_ID::kFLST);
+		auto forms = FormUtil::GetFormsFromFormListJson(modJson["armorList"], RE::ENUM_FORM_ID::kARMO);
 
-		if (keyword == NULL || attachSlot == NULL || addon == NULL || listBase == NULL)
+		if (keyword == NULL || attachSlot == NULL || addon == NULL || forms.empty())
 		{
 			REX::ERROR(std::format("Incomplete entry for {0}.", path.string()));
 			return;
 		}
 
-		auto list = listBase->As<RE::BGSListForm>();
-
 		auto filename = path.filename().string();
 		REX::INFO(std::format("Processing '{0}'.", filename));
 
-		for (auto& form : list->arrayOfForms)
+		for (auto& form : forms)
 		{
 			ProcessArmorForm(form, keyword, attachSlot, addon);
 		}

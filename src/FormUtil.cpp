@@ -121,11 +121,13 @@ namespace FormUtil
 	{
 		std::vector<RE::TESForm*> result;
 
-		if (container.empty()) {
+		if (container.empty())
+		{
 			return result;
 		}
 
-		if (container.isString()) {
+		if (container.isString())
+		{
 			auto stringForm = GetFormFromString(container.asString(), type);
 
 			if (stringForm == NULL) {
@@ -136,19 +138,76 @@ namespace FormUtil
 			return result;
 		}
 
+		if (container.isArray())
+		{
+			for (auto value: container)
+			{
+				if (!value.isString())
+				{
+					continue;
+				}
+
+				auto stringForm = GetFormFromString(value.asString(), type);
+
+				if (stringForm == NULL) {
+					continue;
+				}
+
+				result.push_back(stringForm);
+			}
+
+			return result;
+		}
+
 		auto keys = container.getMemberNames();
 
-		for (auto& key : keys) {
+		for (auto& key : keys)
+		{
 			auto formIdValue = container[key];
 
-			if (!formIdValue.isInt()) {
+			if (!formIdValue.isInt())
+			{
 				continue;
 			}
 
 			auto formId = formIdValue.asInt();
 			auto form = GetFormFromMod(key, formId, type);
 
-			if (form != NULL) {
+			if (form != NULL)
+			{
+				result.push_back(form);
+			}
+		}
+
+		return result;
+	}
+
+	std::vector<RE::TESForm*> GetFormsFromFormListJson(Json::Value container, RE::ENUM_FORM_ID type)
+	{
+		std::vector<RE::TESForm*> result;
+		auto formLists = GetFormsFromJson(container, RE::ENUM_FORM_ID::kFLST);
+
+		for (auto& formList: formLists)
+		{
+			if (formList == NULL || formList->GetFormType() != RE::ENUM_FORM_ID::kFLST)
+			{
+				continue;
+			}
+
+			auto list = formList->As<RE::BGSListForm>();
+
+			for (auto& form : list->arrayOfForms)
+			{
+				if (form == NULL)
+				{
+					continue;
+				}
+
+				if (form->GetFormType() != type)
+				{
+					continue;
+				}
+
 				result.push_back(form);
 			}
 		}

@@ -15,6 +15,8 @@ namespace FormUtil
 
 	std::vector<RE::TESForm*> GetFormsFromJson(Json::Value container, RE::ENUM_FORM_ID type);
 
+	std::vector<RE::TESForm*> GetFormsFromFormListJson(Json::Value container, RE::ENUM_FORM_ID type);
+
 	uint32_t GetItemCount(RE::TESObjectREFR* container, RE::TESForm* itemBase);
 
 	std::string GetHexFormId(int id);
