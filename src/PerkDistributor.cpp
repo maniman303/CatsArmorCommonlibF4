@@ -36,7 +36,7 @@ namespace PerkDistributor
             return false;
         }
 
-        if ((npc->IsPlayer() && !excludePlayer) || npc->IsDeleted())
+        if ((npc->IsPlayer() && excludePlayer) || npc->IsDeleted() || npc->IsDisabled())
         {
             // REX::INFO("Npc doesn't match criteria... [{}]", npc->GetFullName());
             return false;
