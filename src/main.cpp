@@ -21,7 +21,7 @@ bool InitModCore(const F4SE::QueryInterface* a_f4se)
 	}
 
 	const auto ver = a_f4se->RuntimeVersion();
-	if (ver < F4SE::RUNTIME_1_10_980) {
+	if (ver < F4SE::RUNTIME_1_11_159) {
 		auto verString = ver.string();
 		REX::ERROR(std::format("unsupported runtime v{}", verString));
 		return false;
