@@ -7,6 +7,11 @@ namespace Hooks
 	{
 		InitLoadGame::Hook(aThis, buf);
 
+		if (aThis == NULL)
+		{
+			return;
+		}
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -27,6 +32,11 @@ namespace Hooks
 
 	bool ShouldBackgroundClone::thunk(RE::Actor* aThis)
 	{
+		if (aThis == NULL)
+		{
+			return ShouldBackgroundClone::Hook(aThis);
+		}
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -45,6 +55,11 @@ namespace Hooks
 	{
 		Revert::Hook(aThis, buf);
 
+		if (aThis == NULL)
+		{
+			return;
+		}
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
@@ -56,6 +71,11 @@ namespace Hooks
 
 	void LoadGame::thunk(RE::Actor* aThis, RE::BGSLoadFormBuffer* buf)
 	{
+		if (aThis == NULL)
+		{
+			return;
+		}
+
 		auto npc = aThis->GetNPC();
 		if (npc == NULL)
 		{
