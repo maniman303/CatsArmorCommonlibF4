@@ -245,6 +245,14 @@ Function UpdateHeadgearOfNearbyActors()
 	
 	;CATS:ScriptExtender.Trace("Found " + actorsLength + " actors")
 	
+	if (Player.HasKeyword(ActorProcessing))
+		Player.RemoveKeyword(ActorProcessing)
+		ValidateHeadgearHair(Player, false)
+		Player.QueueUpdate(true, 0xC)
+		
+		CATS:ScriptExtender.Trace("Player updated.")
+	endif
+	
 	int i = 0
 	while i < actorsLength
 		Actor npc = GetValidActor(kActors[i])
@@ -253,7 +261,7 @@ Function UpdateHeadgearOfNearbyActors()
 			
 			if (ValidateHeadgearHair(npc, false))
 				npc.QueueUpdate(true, 0xC)
-				; CATS:ScriptExtender.Trace("Found actor [" + npc.GetDisplayName() + "]")
+				CATS:ScriptExtender.Trace("Update appearance of [" + npc.GetDisplayName() + "].")
 			endif
 		endif
 		

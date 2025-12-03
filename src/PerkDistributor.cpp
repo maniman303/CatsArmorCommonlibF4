@@ -57,6 +57,59 @@ namespace PerkDistributor
         return IsNpcValid(npc, true);
     }
 
+    bool IsSpellIncluded(RE::SpellItem* spell, RE::TESNPC* npc)
+    {
+        if (npc == NULL)
+        {
+            return false;
+        }
+
+        auto spellList = npc->GetSpellList();
+        if (spellList == NULL)
+        {
+            return true;
+        }
+
+        for (uint32_t i = 0; i < spellList->numSpells; i++)
+        {
+            auto iter = spellList->spells[i];
+
+            if (iter == spell)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool IsPerkIncluded(RE::BGSPerk* perk, RE::TESNPC* npc)
+    {
+        if (npc == NULL)
+        {
+            return false;
+        }
+
+        auto perks = npc->perks;
+        auto perkCount = npc->perkCount;
+        if (perks == NULL && perkCount > 0)
+        {
+            return false;
+        }
+
+        for (uint32_t i = 0; i < perkCount; i++)
+        {
+            auto iter = perks[i];
+
+            if (iter.perk == perk)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     bool TryProcessNpc(RE::TESNPC* npc)
     {
         if (!IsNpcValid(npc))
@@ -82,21 +135,21 @@ namespace PerkDistributor
 
         bool res = true;
 
-        if (!npc->GetSpellList()->AddSpells(std::vector<RE::SpellItem*>{spell}))
+        if (!npc->AddPerk(perk, 1) && !IsPerkIncluded(perk, npc))
         {
-            REX::WARN("Failed to add spell.");
+            REX::WARN(std::format("Failed to add perk to [{}].", npc->GetFullName()));
             res = false;
         }
 
-        if (!npc->AddPerks(std::vector<RE::BGSPerk*>{perk}, 1))
+        if (!npc->AddSpell(spell) && !IsSpellIncluded(spell, npc))
         {
-            REX::WARN("Failed to add perk.");
+            REX::WARN(std::format("Failed to add spell to [{}].", npc->GetFullName()));
             res = false;
         }
 
         if (res)
         {
-            // REX::INFO("Added spell and perk to [{}]", npc->GetFullName());
+            // REX::INFO(std::format("Added spell and perk to [{}]", npc->GetFullName()));
         }
 
         return res;

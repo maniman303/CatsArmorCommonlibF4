@@ -110,7 +110,7 @@ private:
             return RE::BSEventNotifyControl::kContinue;
         }
 
-        if (!PerkDistributor::IsNpcValid(npc))
+        if (!PerkDistributor::IsNpcValid(npc, false))
         {
             return RE::BSEventNotifyControl::kContinue;
         }
