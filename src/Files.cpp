@@ -46,10 +46,6 @@ namespace Files
 			return false;
 		}
 
-		if (modIndexOpt.value() == 0) {
-			return false;
-		}
-
 		isFilePresent = true;
 
 		return true;
