@@ -2,11 +2,14 @@
 
 This is a Cats Armor plugin, responsible for dynamic patching of armors, and perk and spell distribution onto NPCs.
 
+### OG version
+Repo for Fallout 4 OG version can be found [here](https://github.com/maniman303/CatsArmorCommonlibF4-OG).
+
 ### Requirements
 * [XMake](https://xmake.io) [2.8.2+]
 * C++23 Compiler (MSVC or Clang-CL)
 
-## Getting Started
+### Getting Started
 ```bat
 git clone --recurse-submodules https://github.com/maniman303/CatsArmorCommonlibF4.git
 cd CatsArmorCommonlibF4
