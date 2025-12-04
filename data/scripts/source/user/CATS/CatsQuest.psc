@@ -239,19 +239,21 @@ EndFunction
 
 Function UpdateHeadgearOfNearbyActors()
 	Actor Player = Game.GetPlayer()
-	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorProcessing, 450)
-	
-	int actorsLength = kActors.length
-	
-	;CATS:ScriptExtender.Trace("Found " + actorsLength + " actors")
 	
 	if (Player.HasKeyword(ActorProcessing))
 		Player.RemoveKeyword(ActorProcessing)
+		Utility.WaitMenuMode(1.5)
 		ValidateHeadgearHair(Player, false)
 		Player.QueueUpdate(true, 0xC)
 		
 		CATS:ScriptExtender.Trace("Player updated.")
 	endif
+	
+	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorProcessing, 450)
+	
+	int actorsLength = kActors.length
+	
+	;CATS:ScriptExtender.Trace("Found " + actorsLength + " actors")
 	
 	int i = 0
 	while i < actorsLength

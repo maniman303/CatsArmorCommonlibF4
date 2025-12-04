@@ -27,11 +27,15 @@
 	"headgear": {
 		"enabled": true,
 		"keywordToAdd": "Cats Armor.esl|13",
+		"keywordHidden": "Cats Armor.esl|19",
 		"attachSlotToAdd": "Cats Armor.esl|1F",
 		"armorAddon": "Cats Armor.esl|7",
 		"keywordHairLong": "Cats Armor.esl|21",
 		"keywordHairTop": "Cats Armor.esl|20",
 		"keywordHairBeard": "Cats Armor.esl|22",
+		"armorHairLong": "Cats Armor.esl|0B",
+		"armorHairTop": "Cats Armor.esl|0C",
+		"armorHairBeard": "Cats Armor.esl|0D"
 	},
 	"magic": {
 		"spell": "Cats Armor.esl|45",
