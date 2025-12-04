@@ -3,6 +3,7 @@
 #include "PapyrusUtil.h"
 #include "Setup.h"
 #include "Files.h"
+#include "ActorManager.h"
 
 class ActorEquipManagerSink : public RE::BSTEventSink<RE::ActorEquipManagerEvent::Event>
 {
@@ -117,7 +118,10 @@ private:
 
         // REX::INFO("Send headgear event");
 
-        SendHeadgearPapyrusEvent(actor);
+        if (!ActorManager::ProcessHairStubs(actor, *itemInstance, aEvent.changeType.get() == RE::ActorEquipManagerEvent::Type::kUnequip))
+        {
+            SendHeadgearPapyrusEvent(actor);
+        }
 
         return RE::BSEventNotifyControl::kContinue;
     }
