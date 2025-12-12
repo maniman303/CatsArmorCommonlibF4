@@ -15,6 +15,15 @@ git clone --recurse-submodules https://github.com/maniman303/CatsArmorCommonlibF
 cd CatsArmorCommonlibF4
 ```
 
+## VS Code Setup
+
+Run
+```bat
+xmake project -k compile_commands -y
+```
+
+Then move `compile_commands.json` to `.vscode` folder.
+
 ### Build
 To build the project, run the following command:
 ```bat
