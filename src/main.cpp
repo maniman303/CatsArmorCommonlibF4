@@ -12,6 +12,7 @@
 #include "HeadgearProcessor.h"
 #include "PerkDistributor.h"
 #include "ActorEquipManagerListener.h"
+#include "ExclusionManager.h"
 
 bool InitModCore(const F4SE::QueryInterface* a_f4se)
 {
@@ -53,6 +54,8 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 			REX::ERROR("Incomplete setup.");
 			return;
 		}
+
+		ExclusionManager::Initialize();
 
 		ArmorProcessor::ProcessArmorFiles();
 		HeadgearProcessor::ProcessHeadgearFiles();
