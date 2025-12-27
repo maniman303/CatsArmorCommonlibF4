@@ -12,13 +12,16 @@ namespace HeadgearProcessor
 {
 	bool AdjustHairOnlyHeadgear(RE::TESObjectARMO *armor, Setup::TypedSetup setup)
 	{
+		if (armor == NULL)
+		{
+			return false;
+		}
+
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
+		uint32_t mask = hairTopMask | hairLongMask;
 
-		uint32_t mask = hairTopMask;
-		mask = mask | hairLongMask;
-
-		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
+		uint32_t newSlot = 1 << 16;
 
 		if ((armor->formFlags & 4) != 0)
 		{
@@ -26,8 +29,7 @@ namespace HeadgearProcessor
 		}
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
-
-		if ((bipedSlots & ~mask) != 0 || bipedSlots == 0)
+		if ((bipedSlots & ~mask) > 0 || bipedSlots == 0)
 		{
 			return false;
 		}
@@ -38,7 +40,6 @@ namespace HeadgearProcessor
 		}
 
 		bipedSlots = bipedSlots | newSlot;
-
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
 
 		return true;
@@ -67,20 +68,47 @@ namespace HeadgearProcessor
 			}
 		}
 
-		REX::INFO("Adjusted {} headgears.", adjusted);
+		REX::INFO(std::format("Adjusted {} headgears.", adjusted));
 	}
 
-	void SetArmorAddonBipedIndexes(RE::TESObjectARMA* addon, uint32_t mainBipedSlots, Setup::TypedSetup setup)
+	void SetArmorAddonBipedIndexes(RE::TESObjectARMO* armor, uint32_t newSlot)
 	{
-		auto bipedSlots = addon->bipedModelData.bipedObjectSlots;
-
-		if ((bipedSlots & mainBipedSlots) == 0) {
-			uint32_t newSlot = 1 << (setup.bipedIndex - 30);
-
-			bipedSlots = bipedSlots | newSlot;
+		if (armor == NULL)
+		{
+			return;
 		}
 
-		addon->bipedModelData.bipedObjectSlots = bipedSlots;
+		uint32_t hairTopMask = 1;
+		uint32_t hairLongMask = 2;
+		uint32_t hairBeardMask = 1 << 18;
+		uint32_t mask = hairTopMask | hairLongMask | hairBeardMask;
+
+		uint32_t slotsTaken = 0;
+
+		for (auto& arma : armor->modelArray)
+		{
+			auto addon = arma.armorAddon;
+			if (addon == NULL)
+			{
+				continue;
+			}
+
+			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
+			if ((addonSlots & slotsTaken) > 0)
+			{
+				continue;
+			}
+
+			slotsTaken = slotsTaken | addonSlots;
+
+			if ((addonSlots & ~mask) > 0)
+			{
+				continue;
+			}
+
+			addonSlots = addonSlots | newSlot;
+			addon->bipedModelData.bipedObjectSlots = addonSlots;
+		}
 	}
 
 	std::vector<RE::BGSKeyword*> SetArmorBipedIndexes(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
@@ -92,7 +120,7 @@ namespace HeadgearProcessor
 		uint32_t hairBeardMask = 1 << 18;
 		uint32_t headbandMask = 1 << 16;
 
-		uint32_t newSlot = 1 << (setup.bipedIndex - 30);
+		uint32_t setupSlot = 1 << (setup.bipedIndex - 30);
 
 		// REX::INFO("Processing [{}].", armor->GetFullName());
 
@@ -117,20 +145,27 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots & ~hairLongMask;
 		bipedSlots = bipedSlots & ~hairBeardMask;
 
-		bipedSlots = bipedSlots | newSlot;
-		bipedSlots = bipedSlots | headbandMask;
+		uint32_t newAddonSlot = headbandMask;
+
+		for (auto& ae : armor->modelArray)
+		{
+			if (ae.armorAddon == NULL)
+			{
+				continue;
+			}
+
+			auto addonSlots = ae.armorAddon->bipedModelData.bipedObjectSlots;
+			if ((addonSlots & headbandMask) > 0)
+			{
+				newAddonSlot = setupSlot;
+			}
+		}
+
+		bipedSlots = bipedSlots | newAddonSlot;
 
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
 
-		auto modelsSize = armor->modelArray.size();
-		if (modelsSize > 1)
-		{
-			// REX::WARN("Many ARMO: {} [{}]", modelsSize, armor->GetFullName());
-		}
-
-		for (auto& ae : armor->modelArray) {
-			SetArmorAddonBipedIndexes(ae.armorAddon, bipedSlots, setup);
-		}
+		SetArmorAddonBipedIndexes(armor, newAddonSlot);
 
 		return res;
 	}
@@ -187,15 +222,92 @@ namespace HeadgearProcessor
 		}
 	}
 
-	bool ValidateHeadgear(RE::TESObjectARMO* armor)
+	bool ValidateArmorAddons(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
 	{
+		auto armorSlots = armor->bipedModelData.bipedObjectSlots;
+
+		uint32_t hairTopMask = 1;
+		uint32_t hairLongMask = 2;
+		uint32_t hairBeardMask = 1 << 18;
+		uint32_t mask = hairTopMask | hairLongMask | hairBeardMask;
+
+		uint32_t headbandMask = 1 << 16;
+		uint32_t extraMask = 1 << (setup.bipedIndex - 30);
+
+		int addonsWithOnlyHair = 0;
+		int addonsWithHeadband = 0;
+		int addonsWithExtra = 0;
+
+		uint32_t slotsTaken = 0;
+
+		for (auto& arma : armor->modelArray)
+		{
+			auto addon = arma.armorAddon;
+			if (addon == NULL)
+			{
+				continue;
+			}
+
+			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
+			if ((addonSlots & armorSlots) == 0 || (addonSlots & slotsTaken) > 0)
+			{
+				continue;
+			}
+
+			slotsTaken = slotsTaken | addonSlots;
+
+			if ((addonSlots & ~mask) == 0)
+			{
+				addonsWithOnlyHair++;
+			}
+
+			if ((addonSlots & headbandMask) > 0)
+			{
+				addonsWithHeadband++;
+			}
+
+			if ((addonSlots & extraMask) > 0)
+			{
+				addonsWithExtra++;
+			}
+		}
+
+		if (addonsWithOnlyHair > 1)
+		{
+			REX::ERROR(std::format("Headgear [{0}] has too many hair only armor addons.", armor->GetFullName()));
+			return false;
+		}
+
+		if (addonsWithOnlyHair > 0 && addonsWithHeadband > 0 && addonsWithExtra > 0)
+		{
+			REX::ERROR(std::format("Headgear [{0}] has incompatible armor addon setup.", armor->GetFullName()));
+			return false;
+		}
+
+		return true;
+	}
+
+	bool ValidateHeadgear(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
+	{
+		if (ExclusionManager::Contains(armor))
+		{
+			REX::INFO(std::format("Excluded [{0}].", armor->GetFullName()));
+			return false;
+		}
+
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
 		uint32_t mask = hairTopMask | hairLongMask;
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
 
-		return (bipedSlots & mask) > 0;
+		if ((bipedSlots & mask) <= 0)
+		{
+			REX::WARN(std::format("Headgear [{0}] with id 0x{1:X} does not take hair slots.", armor->GetFullName(), armor->GetFormID()));
+			return false;
+		}
+
+		return ValidateArmorAddons(armor, setup);
 	}
 
 	void ProcessHeadgearForm(RE::TESForm* form, Setup::TypedSetup setup)
@@ -212,15 +324,8 @@ namespace HeadgearProcessor
 
 		auto armor = form->As<RE::TESObjectARMO>();
 
-		if (ExclusionManager::Contains(armor))
+		if (!ValidateHeadgear(armor, setup))
 		{
-			REX::INFO(std::format("Excluded [{0}].", armor->GetFullName()));
-			return;
-		}
-
-		if (!ValidateHeadgear(armor))
-		{
-			REX::WARN(std::format("Headgear [{0}] with id 0x{1:X} does not take hair slots.", armor->GetFullName(), armor->GetFormID()));
 			return;
 		}
 
