@@ -111,15 +111,19 @@ private:
             return RE::BSEventNotifyControl::kContinue;
         }
 
+        // REX::INFO("Item not null");
+
         if (!PerkDistributor::IsNpcValid(npc, false))
         {
             return RE::BSEventNotifyControl::kContinue;
         }
 
-        // REX::INFO("Send headgear event");
+        // REX::INFO("Npc is valid");
 
         if (!ActorManager::ProcessHairStubs(actor, *itemInstance, aEvent.changeType.get() == RE::ActorEquipManagerEvent::Type::kUnequip))
         {
+            // REX::INFO("Send headgear event.");
+
             SendHeadgearPapyrusEvent(actor);
         }
 

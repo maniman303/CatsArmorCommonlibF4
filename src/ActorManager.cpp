@@ -1,6 +1,20 @@
 #include "ActorManager.h"
 #include "Setup.h"
 
+uint32_t CountStacks(const RE::BGSInventoryItem& itemData)
+{
+    uint32_t res = 0;
+
+    auto stack = itemData.stackData.get();
+    while (stack != NULL)
+    {
+        res++;
+        stack = stack->nextStack.get();
+    }
+
+    return res;
+}
+
 bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword)
 {
     if (actor == NULL || keyword == NULL)
@@ -8,7 +22,14 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword)
         return false;
     }
 
-    for (auto itemData : actor->inventoryList->data)
+    auto inventoryList = actor->inventoryList;
+    if (inventoryList == NULL)
+    {
+        REX::WARN(std::format("Inventory for actor [{0}] is NULL.", actor->GetDisplayFullName()));
+        return false;
+    }
+
+    for (const auto& itemData : inventoryList->data)
     {
         auto object = itemData.object;
         if (object == NULL)
@@ -23,12 +44,12 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword)
 
         auto armor = object->As<RE::TESObjectARMO>();
 
-        for (uint32_t i = 0; i < itemData.GetCount(); i++)
+        for (uint32_t i = 0; i < CountStacks(itemData); i++)
         {
             auto stack = itemData.GetStackByID(i);
             if (stack == NULL)
             {
-                // REX::INFO("Continued.");
+                // REX::INFO("Stack is null, continued.");
                 continue;
             }
 
@@ -127,14 +148,26 @@ bool ActorManager::IsItemEquipped(RE::Actor* actor, RE::BGSObjectInstance instan
 bool ActorManager::ProcessHairStubs(RE::Actor* actor, RE::BGSObjectInstance armor, bool isUnequipEvent)
 {
     auto setup = Setup::GetForms("headgear");
+    if (setup.isEmpty)
+    {
+        return true;
+    }
+
+    // REX::INFO("Process hair stubs, setup is valid.");
 
     bool isVisibleHelmetWorn = ActorManager::WornHasKeyword(actor, setup.keyword) &&
         !ActorManager::WornHasKeyword(actor, setup.keywordHidden);
 
+    // REX::INFO("Worn keyboards checked.");
+
     bool isEquipped = ActorManager::IsItemEquipped(actor, armor);
+
+    // REX::INFO("Is equipped checked.");
 
     if (!isUnequipEvent && !isEquipped)
     {
+        // REX::INFO("Process hair stubs quick return.");
+
         // Skip broken events
         return false;
     }
@@ -147,16 +180,26 @@ bool ActorManager::ProcessHairStubs(RE::Actor* actor, RE::BGSObjectInstance armo
 
     auto equipManager = RE::ActorEquipManager::GetSingleton();
 
+    // REX::INFO("Equip manager set up.");
+
     if (!isVisibleHelmetWorn || !isEquipped)
     {
+        // REX::INFO("Process unequip.");
+
         equipManager->UnequipObject(actor, &instanceHairTop, 1, NULL, 0, true, true, false, true, NULL);
         equipManager->UnequipObject(actor, &instanceHairLong, 1, NULL, 0, true, true, false, true, NULL);
         equipManager->UnequipObject(actor, &instanceHairBeard, 1, NULL, 0, true, true, false, true, NULL);
 
+        // REX::INFO("Process unequip completed.");
+
         actor->Reset3D(true, 0, true, 0xC);
+
+        // REX::INFO("3D reset completed.");
 
         return isUnequipEvent != isEquipped;
     }
+
+    // REX::INFO("Process equip.");
 
     bool res = true;
 
@@ -175,7 +218,11 @@ bool ActorManager::ProcessHairStubs(RE::Actor* actor, RE::BGSObjectInstance armo
         res = res && equipManager->EquipObject(actor, instanceHairBeard, 0, 1, NULL, true, true, false, true, true);
     }
 
+    // REX::INFO("Process equip completed.");
+
     actor->Reset3D(true, 0, true, 0xC);
+
+    // REX::INFO("3D reset completed.");
 
     return res && (isUnequipEvent != isEquipped);
 }
