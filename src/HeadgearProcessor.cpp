@@ -94,7 +94,7 @@ namespace HeadgearProcessor
 
 			if (pair.second)
 			{
-				REX::WARN(std::format("Could not add headband slot to armor addon 0x{0:X}."));
+				REX::WARN(std::format("Could not add headband slot to armor addon 0x{0:X}.", addon->GetFormID()));
 				continue;
 			}
 
