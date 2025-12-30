@@ -83,7 +83,7 @@ namespace HeadgearProcessor
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
 		uint32_t hairBeardMask = 1 << 18;
-		uint32_t mask = hairTopMask | hairLongMask | hairBeardMask;
+		uint32_t mask = hairTopMask | hairLongMask | hairBeardMask | newSlot;
 
 		uint32_t slotsTaken = 0;
 
@@ -153,7 +153,7 @@ namespace HeadgearProcessor
 
 		uint32_t newAddonSlot = 1 << (setup.bipedIndex - 30);
 
-		if (SetArmorAddonBipedIndexes(armor, newAddonSlot))
+		if (SetArmorAddonBipedIndexes(armor, newAddonSlot) && (bipedSlots & newAddonSlot) == 0)
 		{
 			bipedSlots = bipedSlots | newAddonSlot;
 
