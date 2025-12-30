@@ -72,11 +72,14 @@ namespace HeadgearProcessor
 				auto uniqueAddonsNo = CountUniqueAddons(armor);
 				if (processableAddons.contains(addon))
 				{
-					processableAddons[addon] = processableAddons[addon] || uniqueAddonsNo > 1;
+					if (uniqueAddonsNo > 1)
+					{
+						processableAddons[addon] = true;
+					}
 				}
 				else
 				{
-					processableAddons[addon] = uniqueAddonsNo > 1;
+					processableAddons[addon] = (uniqueAddonsNo > 1);
 				}
 			}
 		}
