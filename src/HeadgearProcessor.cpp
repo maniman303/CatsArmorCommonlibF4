@@ -71,11 +71,13 @@ namespace HeadgearProcessor
 		REX::INFO(std::format("Adjusted {} headgears.", adjusted));
 	}
 
-	void SetArmorAddonBipedIndexes(RE::TESObjectARMO* armor, uint32_t newSlot)
+	bool SetArmorAddonBipedIndexes(RE::TESObjectARMO* armor, uint32_t newSlot)
 	{
+		bool res = false;
+
 		if (armor == NULL)
 		{
-			return;
+			return res;
 		}
 
 		uint32_t hairTopMask = 1;
@@ -108,7 +110,11 @@ namespace HeadgearProcessor
 
 			addonSlots = addonSlots | newSlot;
 			addon->bipedModelData.bipedObjectSlots = addonSlots;
+
+			res = true;
 		}
+
+		return res;
 	}
 
 	std::vector<RE::BGSKeyword*> SetArmorBipedIndexes(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
@@ -119,8 +125,6 @@ namespace HeadgearProcessor
 		uint32_t hairLongMask = 2;
 		uint32_t hairBeardMask = 1 << 18;
 		uint32_t headbandMask = 1 << 16;
-
-		uint32_t setupSlot = 1 << (setup.bipedIndex - 30);
 
 		// REX::INFO("Processing [{}].", armor->GetFullName());
 
@@ -145,27 +149,18 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots & ~hairLongMask;
 		bipedSlots = bipedSlots & ~hairBeardMask;
 
-		uint32_t newAddonSlot = headbandMask;
+		bipedSlots = bipedSlots | headbandMask;
 
-		for (auto& ae : armor->modelArray)
+		uint32_t newAddonSlot = 1 << (setup.bipedIndex - 30);
+
+		if (SetArmorAddonBipedIndexes(armor, newAddonSlot))
 		{
-			if (ae.armorAddon == NULL)
-			{
-				continue;
-			}
+			bipedSlots = bipedSlots | newAddonSlot;
 
-			auto addonSlots = ae.armorAddon->bipedModelData.bipedObjectSlots;
-			if ((addonSlots & headbandMask) > 0)
-			{
-				newAddonSlot = setupSlot;
-			}
+			REX::INFO(std::format("Adjusted slots for [{0}].", armor->GetFullName()));
 		}
 
-		bipedSlots = bipedSlots | newAddonSlot;
-
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
-
-		SetArmorAddonBipedIndexes(armor, newAddonSlot);
 
 		return res;
 	}
@@ -231,11 +226,9 @@ namespace HeadgearProcessor
 		uint32_t hairBeardMask = 1 << 18;
 		uint32_t mask = hairTopMask | hairLongMask | hairBeardMask;
 
-		uint32_t headbandMask = 1 << 16;
 		uint32_t extraMask = 1 << (setup.bipedIndex - 30);
 
 		int addonsWithOnlyHair = 0;
-		int addonsWithHeadband = 0;
 		int addonsWithExtra = 0;
 
 		uint32_t slotsTaken = 0;
@@ -261,11 +254,6 @@ namespace HeadgearProcessor
 				addonsWithOnlyHair++;
 			}
 
-			if ((addonSlots & headbandMask) > 0)
-			{
-				addonsWithHeadband++;
-			}
-
 			if ((addonSlots & extraMask) > 0)
 			{
 				addonsWithExtra++;
@@ -278,7 +266,7 @@ namespace HeadgearProcessor
 			return false;
 		}
 
-		if (addonsWithOnlyHair > 0 && addonsWithHeadband > 0 && addonsWithExtra > 0)
+		if (addonsWithOnlyHair > 0 && addonsWithExtra > 0)
 		{
 			REX::ERROR(std::format("Headgear [{0}] has incompatible armor addon setup.", armor->GetFullName()));
 			return false;
