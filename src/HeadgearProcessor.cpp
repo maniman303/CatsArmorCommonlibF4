@@ -277,12 +277,6 @@ namespace HeadgearProcessor
 
 	bool ValidateHeadgear(RE::TESObjectARMO* armor, Setup::TypedSetup setup)
 	{
-		if (ExclusionManager::Contains(armor))
-		{
-			REX::INFO(std::format("Excluded [{0}].", armor->GetFullName()));
-			return false;
-		}
-
 		uint32_t hairTopMask = 1;
 		uint32_t hairLongMask = 2;
 		uint32_t mask = hairTopMask | hairLongMask;
@@ -291,7 +285,13 @@ namespace HeadgearProcessor
 
 		if ((bipedSlots & mask) <= 0)
 		{
-			REX::WARN(std::format("Headgear [{0}] with id 0x{1:X} does not take hair slots.", armor->GetFullName(), armor->GetFormID()));
+			// REX::WARN(std::format("Headgear [{0}] with id 0x{1:X} does not take hair slots.", armor->GetFullName(), armor->GetFormID()));
+			return false;
+		}
+
+		if (ExclusionManager::Contains(armor))
+		{
+			REX::INFO(std::format("Excluded [{0}].", armor->GetFullName()));
 			return false;
 		}
 
