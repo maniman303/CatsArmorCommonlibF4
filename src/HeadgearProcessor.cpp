@@ -13,13 +13,18 @@ namespace HeadgearProcessor
 {
 	std::unordered_set<RE::TESObjectARMA*> addonsToHeadband;
 
-	int CountUniqueAddons(RE::TESObjectARMO* armor)
+	int CountUniqueAddons(RE::TESObjectARMO* armor, uint16_t index, uint32_t slot = 0)
 	{
 		int res = 0;
 		uint32_t slotsTaken = 0;
 
 		for (const auto& arma : armor->modelArray)
 		{
+			if (arma.index != index)
+			{
+				continue;
+			}
+
 			auto addon = arma.armorAddon;
 			if (addon == NULL)
 			{
@@ -27,6 +32,11 @@ namespace HeadgearProcessor
 			}
 
 			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
+			if (slot != 0 && (addonSlots & slot) == 0)
+			{
+				continue;
+			}
+
 			if ((addonSlots & slotsTaken) != 0)
 			{
 				continue;
@@ -46,6 +56,8 @@ namespace HeadgearProcessor
 		{
 			return;
 		}
+
+		uint32_t headbandSlot = 1 << 16;
 
 		std::unordered_map<RE::TESObjectARMA*, bool> processableAddons;
 		const auto& armorArray = dataHandler->GetFormArray<RE::TESObjectARMO>();
@@ -69,22 +81,21 @@ namespace HeadgearProcessor
 					continue;
 				}
 
-				auto uniqueAddonsNo = CountUniqueAddons(armor);
+				auto uniqueAddonsNo = CountUniqueAddons(armor, arma.index, headbandSlot);
 				if (processableAddons.contains(addon))
 				{
-					if (uniqueAddonsNo > 1)
+					if (uniqueAddonsNo > 0)
 					{
 						processableAddons[addon] = true;
 					}
 				}
 				else
 				{
-					processableAddons[addon] = (uniqueAddonsNo > 1);
+					processableAddons[addon] = (uniqueAddonsNo > 0);
 				}
 			}
 		}
 
-		uint32_t headbandSlot = 1 << 16;
 		int adjusted = 0;
 
 		for (const auto& pair : processableAddons)
