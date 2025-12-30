@@ -1,6 +1,7 @@
 #include <json/json.h>
 #include <json/value.h>
 #include <vector>
+#include <unordered_set>
 #include "HeadgearProcessor.h"
 #include "Files.h"
 #include "Setup.h"
@@ -10,6 +11,31 @@
 
 namespace HeadgearProcessor
 {
+	std::unordered_map<RE::TESObjectARMA*, bool> addonsToHeadband;
+
+	void ProcessAddonsToHeadband()
+	{
+		uint32_t headbandSlot = 1 << 16;
+
+		for (const auto& pair : addonsToHeadband)
+		{
+			if (pair.second)
+			{
+				continue;
+			}
+
+			auto addon = pair.first;
+			if (addon == NULL)
+			{
+				continue;
+			}
+
+			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
+			addonSlots = addonSlots | headbandSlot;
+			addon->bipedModelData.bipedObjectSlots = addonSlots;
+		}
+	}
+
 	bool AdjustHairOnlyHeadgear(RE::TESObjectARMO *armor, Setup::TypedSetup setup)
 	{
 		if (armor == NULL)
@@ -29,7 +55,7 @@ namespace HeadgearProcessor
 		}
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
-		if ((bipedSlots & ~mask) > 0 || bipedSlots == 0)
+		if ((bipedSlots & ~mask) != 0 || bipedSlots == 0)
 		{
 			return false;
 		}
@@ -96,20 +122,29 @@ namespace HeadgearProcessor
 			}
 
 			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
-			if ((addonSlots & slotsTaken) > 0)
+			if ((addonSlots & slotsTaken) != 0)
 			{
 				continue;
 			}
 
 			slotsTaken = slotsTaken | addonSlots;
 
-			if ((addonSlots & ~mask) > 0)
+			if ((addonSlots & ~mask) != 0)
 			{
 				continue;
 			}
 
 			addonSlots = addonSlots | newSlot;
 			addon->bipedModelData.bipedObjectSlots = addonSlots;
+
+			if (addonsToHeadband.contains(addon))
+			{
+				addonsToHeadband[addon] = addonsToHeadband[addon] || (armor->modelArray.size() > 1);
+			}
+			else
+			{
+				addonsToHeadband[addon] = armor->modelArray.size() > 1;
+			}
 
 			res = true;
 		}
@@ -242,7 +277,7 @@ namespace HeadgearProcessor
 			}
 
 			auto addonSlots = addon->bipedModelData.bipedObjectSlots;
-			if ((addonSlots & armorSlots) == 0 || (addonSlots & slotsTaken) > 0)
+			if ((addonSlots & armorSlots) == 0 || (addonSlots & slotsTaken) != 0)
 			{
 				continue;
 			}
@@ -254,7 +289,7 @@ namespace HeadgearProcessor
 				addonsWithOnlyHair++;
 			}
 
-			if ((addonSlots & extraMask) > 0)
+			if ((addonSlots & extraMask) != 0)
 			{
 				addonsWithExtra++;
 			}
@@ -365,7 +400,6 @@ namespace HeadgearProcessor
 		}
 
 		auto setupForms = Setup::GetForms(type);
-
 		if (setupForms.isEmpty)
 		{
 			REX::ERROR(std::format("Missing setup for type: {0}.", type));
@@ -405,8 +439,9 @@ namespace HeadgearProcessor
 
 	void ProcessHeadgearFiles()
 	{
-		auto setup = Setup::GetForms("headgear");
+		addonsToHeadband.clear();
 
+		auto setup = Setup::GetForms("headgear");
 		if (setup.isEmpty || !setup.isEnabled)
 		{
 			REX::WARN("Headgear support is missing or turned off.");
@@ -414,11 +449,12 @@ namespace HeadgearProcessor
 		}
 
 		auto headgearFiles = Files::GetPluginFiles("Armor");
-
 		for (auto& entry : headgearFiles)
 		{
 			ProcessHeadgearEntry(entry);
 		}
+
+		ProcessAddonsToHeadband();
 
 		ProcessHairOnlyHeadgear(setup);
 	}
