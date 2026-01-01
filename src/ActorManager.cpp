@@ -116,7 +116,7 @@ bool ActorManager::IsItemEquipped(RE::Actor* actor, RE::BGSObjectInstance instan
             continue;
         }
 
-        for (uint32_t i = 0; i < itemData.GetCount(); i++)
+        for (uint32_t i = 0; i < CountStacks(itemData); i++)
         {
             auto stack = itemData.GetStackByID(i);
             if (stack == NULL)
