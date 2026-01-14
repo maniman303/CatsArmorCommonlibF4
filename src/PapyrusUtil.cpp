@@ -25,6 +25,11 @@ namespace PapyrusUtil
 
 	void LogScript(std::monostate, RE::BSFixedString message)
 	{
+		if (message == NULL || message.empty())
+		{
+			return;
+		}
+
 		std::string text = message.c_str();
 
 		REX::INFO(std::format("[Script] {0}", text));
@@ -32,6 +37,11 @@ namespace PapyrusUtil
 
 	void Notification(std::monostate, RE::BSFixedString message)
 	{
+		if (message == NULL || message.empty())
+		{
+			return;
+		}
+
 		auto vm = RE::GameVM::GetSingleton()->GetVM().get();
 
 		vm->DispatchStaticCall("Debug", "Notification", NULL, message);
