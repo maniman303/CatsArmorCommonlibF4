@@ -25,19 +25,29 @@ namespace PapyrusUtil
 
 	void LogScript(std::monostate, RE::BSFixedString message)
 	{
-		if (message == NULL || message.empty())
+		if (message.empty())
 		{
 			return;
 		}
 
 		std::string text = message.c_str();
+		if (text == "")
+		{
+			return;
+		}
 
 		REX::INFO(std::format("[Script] {0}", text));
 	}
 
 	void Notification(std::monostate, RE::BSFixedString message)
 	{
-		if (message == NULL || message.empty())
+		if (message.empty())
+		{
+			return;
+		}
+
+		std::string text = message.c_str();
+		if (text == "")
 		{
 			return;
 		}
