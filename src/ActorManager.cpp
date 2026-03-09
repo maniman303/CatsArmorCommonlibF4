@@ -153,21 +153,13 @@ bool ActorManager::ProcessHairStubs(RE::Actor* actor, RE::BGSObjectInstance armo
         return true;
     }
 
-    // REX::INFO("Process hair stubs, setup is valid.");
-
     bool isVisibleHelmetWorn = ActorManager::WornHasKeyword(actor, setup.keyword) &&
         !ActorManager::WornHasKeyword(actor, setup.keywordHidden);
 
-    // REX::INFO("Worn keyboards checked.");
-
     bool isEquipped = ActorManager::IsItemEquipped(actor, armor);
-
-    // REX::INFO("Is equipped checked.");
 
     if (!isUnequipEvent && !isEquipped)
     {
-        // REX::INFO("Process hair stubs quick return.");
-
         // Skip broken events
         return false;
     }
@@ -180,49 +172,49 @@ bool ActorManager::ProcessHairStubs(RE::Actor* actor, RE::BGSObjectInstance armo
 
     auto equipManager = RE::ActorEquipManager::GetSingleton();
 
-    // REX::INFO("Equip manager set up.");
+    bool anyChange = false;
 
     if (!isVisibleHelmetWorn || !isEquipped)
     {
-        // REX::INFO("Process unequip.");
+        anyChange = anyChange || equipManager->UnequipObject(actor, &instanceHairTop, 1, NULL, 0, true, true, false, true, NULL);
+        anyChange = anyChange || equipManager->UnequipObject(actor, &instanceHairLong, 1, NULL, 0, true, true, false, true, NULL);
+        anyChange = anyChange || equipManager->UnequipObject(actor, &instanceHairBeard, 1, NULL, 0, true, true, false, true, NULL);
 
-        equipManager->UnequipObject(actor, &instanceHairTop, 1, NULL, 0, true, true, false, true, NULL);
-        equipManager->UnequipObject(actor, &instanceHairLong, 1, NULL, 0, true, true, false, true, NULL);
-        equipManager->UnequipObject(actor, &instanceHairBeard, 1, NULL, 0, true, true, false, true, NULL);
-
-        // REX::INFO("Process unequip completed.");
-
-        actor->Reset3D(true, 0, true, 0xC);
-
-        // REX::INFO("3D reset completed.");
+        if (anyChange)
+        {
+            actor->Reset3D(true, 0, true, 0xC);
+        }
 
         return isUnequipEvent != isEquipped;
     }
-
-    // REX::INFO("Process equip.");
 
     bool res = true;
 
     if (ActorManager::WornHasKeyword(actor, setup.keywordHairTop))
     {
-        res = res && equipManager->EquipObject(actor, instanceHairTop, 0, 1, NULL, true, true, false, true, true);
+        bool equipSuccessful = equipManager->EquipObject(actor, instanceHairTop, 0, 1, NULL, true, true, false, true, true);
+        res = res && equipSuccessful;
+        anyChange = anyChange || equipSuccessful;
     }
 
     if (ActorManager::WornHasKeyword(actor, setup.keywordHairLong))
     {
-        res = res && equipManager->EquipObject(actor, instanceHairLong, 0, 1, NULL, true, true, false, true, true);
+        bool equipSuccessful = equipManager->EquipObject(actor, instanceHairLong, 0, 1, NULL, true, true, false, true, true);
+        res = res && equipSuccessful;
+        anyChange = anyChange || equipSuccessful;
     }
 
     if (ActorManager::WornHasKeyword(actor, setup.keywordHairBeard))
     {
-        res = res && equipManager->EquipObject(actor, instanceHairBeard, 0, 1, NULL, true, true, false, true, true);
+        bool equipSuccessful = equipManager->EquipObject(actor, instanceHairBeard, 0, 1, NULL, true, true, false, true, true);
+        res = res && equipSuccessful;
+        anyChange = anyChange || equipSuccessful;
     }
 
-    // REX::INFO("Process equip completed.");
-
-    actor->Reset3D(true, 0, true, 0xC);
-
-    // REX::INFO("3D reset completed.");
+    if (anyChange)
+    {
+        actor->Reset3D(true, 0, true, 0xC);
+    }
 
     return res && (isUnequipEvent != isEquipped);
 }
