@@ -65,7 +65,6 @@ private:
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
-            REX::ERROR("Could not retrieve id of the papyrus event actor.");
             return 0;
         }
     }
@@ -79,6 +78,10 @@ private:
         
         auto d = static_cast<PapyrusEventData*>(dataPtr);
         uint32_t actorId = GetSafePapyrusFormId(d);
+        if (actorId == 0) {
+            REX::ERROR("Could not retrieve id of the papyrus event actor.");
+            return;
+        }
         
         RE::BSFixedString sn;
         if (scriptName != NULL) {
