@@ -29,7 +29,7 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword)
         return false;
     }
 
-    for (const auto& itemData : inventoryList->data)
+    for (auto& itemData : inventoryList->data)
     {
         auto object = itemData.object;
         if (object == NULL)
