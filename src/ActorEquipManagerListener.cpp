@@ -208,11 +208,11 @@ private:
             return RE::BSEventNotifyControl::kContinue;
         }
 
-        REX::INFO(std::format("Processing actor [0x{:08X}].", actorId));
+        // REX::INFO(std::format("Processing actor [0x{:08X}].", actorId));
         
         if (!ActorManager::ProcessHairStubs(actor, itemInstance, aEvent.changeType.get() == RE::ActorEquipManagerEvent::Type::kUnequip))
         {
-            REX::INFO("Send headgear event.");
+            // REX::INFO("Send headgear event.");
 
             SendHeadgearPapyrusEvent(actor);
         }
