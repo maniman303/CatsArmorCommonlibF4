@@ -145,18 +145,16 @@ bool ActorManager::IsItemEquipped(RE::Actor* actor, const RE::BGSObjectInstance*
     return false;
 }
 
-bool ActorManager::EquipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
+bool ActorManager::UnequipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
 {
+    if (actor == NULL || armor == NULL)
+    {
+        return false;
+    }
+
     if (actor->GetInventoryObjectCount(armor) <= 0)
     {
-        auto equipIndex = RE::BGSEquipIndex();
-        equipIndex.index = 0;
-        bool addSuccessful = actor->AddWornItem(armor, NULL, 1, true, equipIndex);
-        if (!addSuccessful)
-        {
-            REX::ERROR("Couldn't add armor to actors inventory.");
-            return false;
-        }
+        return true;
     }
 
     auto equipManager = RE::ActorEquipManager::GetSingleton();
@@ -173,21 +171,97 @@ bool ActorManager::EquipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
             continue;
         }
 
-        if (!object->Is<RE::TESObjectARMO>())
-        {
-            continue;
-        }
-
-        auto iterArmor = object->As<RE::TESObjectARMO>();
-        if (iterArmor != armor)
+        if (object != armor)
         {
             continue;
         }
 
         for (uint32_t i = 0; i < CountStacks(itemData); i++)
         {
-            auto instance = new RE::BGSObjectInstance(armor, itemData.GetInstanceData(i));
-            return equipManager->EquipObject(actor, *instance, i, 1, armor->equipSlot, true, true, false, true, true);
+            auto stack = itemData.GetStackByID(i);
+            if (!stack->IsEquipped())
+            {
+                continue;
+            }
+
+            auto instanceData = itemData.GetInstanceData(i);
+            if (instanceData == NULL)
+            {
+                instanceData = &armor->armorData;
+            }
+
+            auto instance = new RE::BGSObjectInstance(armor, instanceData);
+            return equipManager->UnequipObject(actor, instance, 1, armor->equipSlot, i, true, true, false, true, NULL);
+        }
+    }
+
+    return true;
+}
+
+bool ActorManager::EquipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
+{
+    if (actor == NULL || armor == NULL || actor->inventoryList == NULL)
+    {
+        return false;
+    }
+
+    auto itemCount = actor->GetInventoryObjectCount(armor);
+    if (itemCount > 0)
+    {
+        RE::TESObjectREFR::RemoveItemData removeItemData{armor, static_cast<int32_t>(itemCount)};
+        actor->RemoveItem(removeItemData);
+    }
+
+    auto equipIndex = RE::BGSEquipIndex();
+    equipIndex.index = 0;
+
+    actor->inventoryList->rwLock.lock_write();
+
+    bool addSuccessful = actor->AddWornItem(armor, NULL, 1, true, equipIndex);
+
+    actor->inventoryList->rwLock.unlock_write();
+
+    if (!addSuccessful)
+    {
+        REX::ERROR("Couldn't add armor to actors inventory.");
+        return false;
+    }
+
+    auto equipManager = RE::ActorEquipManager::GetSingleton();
+    for (auto itemData : actor->inventoryList->data)
+    {
+        auto object = itemData.object;
+        if (object == NULL)
+        {
+            continue;
+        }
+
+        if (itemData.GetCount() <= 0)
+        {
+            continue;
+        }
+
+        if (object != armor)
+        {
+            continue;
+        }
+
+        if (CountStacks(itemData) > 0)
+        {
+            auto stack = itemData.GetStackByID(0);
+            if (stack->IsEquipped())
+            {
+                return true;
+            }
+
+            auto instanceData = itemData.GetInstanceData(0);
+            if (instanceData == NULL)
+            {
+                REX::WARN("Instance data in equip is null.");
+            }
+
+            auto instance = new RE::BGSObjectInstance(armor, instanceData);
+            return equipManager->EquipObject(actor, *instance, 0, 1, armor->equipSlot, true, true, false, true, true);
         }
     }
 
@@ -224,14 +298,9 @@ bool ActorManager::ProcessHairStubs(RE::Actor* actor, const RE::BGSObjectInstanc
 
     if (!isVisibleHelmetWorn || !isEquipped)
     {
-        auto instanceHairTop = new RE::BGSObjectInstance(armorHairTop, NULL);
-        auto instanceHairLong = new RE::BGSObjectInstance(armorHairLong,  NULL);
-        auto instanceHairBeard = new RE::BGSObjectInstance(armorHairBeard,  NULL);
-        auto equipManager = RE::ActorEquipManager::GetSingleton();
-
-        anyChange = anyChange || equipManager->UnequipObject(actor, instanceHairTop, 1, armorHairTop->equipSlot, 0, true, true, false, true, NULL);
-        anyChange = anyChange || equipManager->UnequipObject(actor, instanceHairLong, 1, armorHairLong->equipSlot, 0, true, true, false, true, NULL);
-        anyChange = anyChange || equipManager->UnequipObject(actor, instanceHairBeard, 1, armorHairBeard->equipSlot, 0, true, true, false, true, NULL);
+        anyChange = anyChange || UnequipItem(actor, armorHairTop);
+        anyChange = anyChange || UnequipItem(actor, armorHairLong);
+        anyChange = anyChange || UnequipItem(actor, armorHairBeard);
 
         if (anyChange)
         {
