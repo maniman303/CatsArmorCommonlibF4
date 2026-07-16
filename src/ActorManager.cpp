@@ -25,7 +25,12 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword, con
     auto inventoryList = actor->inventoryList;
     if (inventoryList == NULL)
     {
-        REX::WARN(std::format("Inventory for actor [{0}] is NULL.", actor->GetDisplayFullName()));
+        auto npc = actor->GetNPC();
+        if (npc != NULL)
+        {
+            REX::WARN(std::format("Inventory for actor [{0}] is NULL.", npc->GetFullName()));
+        }
+
         return false;
     }
 
@@ -204,6 +209,13 @@ bool ActorManager::EquipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
     }
 
     auto itemCount = actor->GetInventoryObjectCount(armor);
+    // if (itemCount > 0)
+    // {
+    //     RE::TESObjectREFR::RemoveItemData removeData(armor, 1);
+    //     actor->RemoveItem(removeData);
+    //     itemCount = 0; 
+    // }
+
     if (itemCount == 0)
     {
         auto equipIndex = RE::BGSEquipIndex();
@@ -211,6 +223,7 @@ bool ActorManager::EquipItem(RE::Actor* actor, RE::TESObjectARMO* armor)
 
         actor->inventoryList->rwLock.lock_write();
 
+        // actor->AddInventoryItem(armor->As<RE::TESBoundObject>(), NULL, 1, NULL, NULL, NULL);
         actor->inventoryList->AddItem2(armor->As<RE::TESBoundObject>(), 1, new RE::ExtraDataList(), 0);
 
         actor->inventoryList->rwLock.unlock_write();
