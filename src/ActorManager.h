@@ -4,7 +4,7 @@
 
 namespace ActorManager
 {
-    bool WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword);
+    bool WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword, const RE::TBO_InstanceData* instance = NULL);
 
     bool IsItemEquipped(RE::Actor* actor, const RE::BGSObjectInstance* instance);
 
