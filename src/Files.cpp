@@ -39,7 +39,7 @@ namespace Files
 	{
 		isFilePresent = false;
 
-		RE::TESDataHandler* dh = RE::TESDataHandler::GetSingleton();
+		auto dh = RE::TESDataHandler::GetSingleton();
 		auto modIndexOpt = dh->GetLoadedLightModIndex("Cats Armor.esl");
 
 		if (!modIndexOpt.has_value()) {
@@ -47,6 +47,26 @@ namespace Files
 		}
 
 		isFilePresent = true;
+
+		return true;
+	}
+
+	bool VerifyConflictPlugins()
+	{
+		auto dh = RE::TESDataHandler::GetSingleton();
+		auto indexOpt = dh->GetLoadedModIndex("ConcealedArmor.esp");
+
+		if (indexOpt.has_value() && indexOpt.value() > 0)
+		{
+			REX::ERROR("CATS armor is not compatible with Concealed Armors!");
+			return false;
+		}
+
+		indexOpt = dh->GetLoadedModIndex("ArmorKeywords.esm");
+		if (indexOpt.has_value() && indexOpt.value() > 0)
+		{
+			REX::WARN("Mod AWKCR has a well know incompatibility with CATS armor.");
+		}
 
 		return true;
 	}
