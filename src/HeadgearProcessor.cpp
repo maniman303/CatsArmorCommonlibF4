@@ -54,14 +54,11 @@ namespace HeadgearProcessor
 				continue;
 			}
 
-			uint8_t combo = 0;
-			uint8_t hairTop = 0;
 			uint8_t headband = 0;
-			uint8_t hairLong = 0;
 			uint8_t newSlot = 0;
-			uint8_t beard = 0;
 			uint8_t mouth = 0;
 
+			uint32_t armorSlots = 0;
 			for (const auto& arma : armor->modelArray)
 			{
 				auto addon = arma.armorAddon;
@@ -88,49 +85,50 @@ namespace HeadgearProcessor
 				}
 
 				auto slots = addon->bipedModelData.bipedObjectSlots;
-				
-				if ((slots & (1 << 0)) && (slots & (1 << 1)))
+				if ((armorSlots & slots) != 0)
 				{
-					if ((slots & (1 << 16)) == 0)
-					{
-						combo++;
-					}
-				}
-				else
-				{
-					if (slots & (1 << 0))
-					{
-						hairTop++;
-					}
-					else 
-
-					if (slots & (1 << 1))
-					{
-						hairLong++;
-					}
-					else if (slots & newMask)
-					{
-						newSlot++;
-					}
+					continue;
 				}
 
-				if (slots & (1 << 18))
+				armorSlots |= slots;
+
+				if (slots & (1 << 16))
 				{
-					beard++;
+					headband++;
+				}
+				else if (slots & newMask)
+				{
+					newSlot++;
 				}
 				else if (slots & (1 << 19))
 				{
 					mouth++;
 				}
+				else if ((slots & (1 << 0)) && (slots & (1 << 1)))
+				{
+					newSlot++;
+				}
+				else if (slots & (1 << 0))
+				{
+					headband++;
+				}
+				else if (slots & (1 << 1))
+				{
+					newSlot++;
+				}
+				else if (slots & (1 << 18))
+				{
+					mouth++;
+				}
 			}
 
-			if ((combo <= 0 || newSlot <= 0) && (hairTop <= 0 || headband <= 0) && (hairLong <= 0 || newSlot <= 0) && (beard <= 0 || mouth <= 0))
+			if (headband <= 1 && newSlot <= 1 && mouth <= 1)
 			{
 				continue;
 			}
 
-			REX::WARN(std::format("Headgear [{0}] contains incompatible addons.", armor->GetFullName()));
-			// REX::WARN(std::format("HairTop: {0}, Neck: {1}, HairLong: {2}, Slot: {3}, Beard: {4}, Mouth: {5}.", hairTop, neck, hairLong, newSlot, beard, mouth));
+			REX::WARN(std::format("Headgear [0x{0:08X}] '{1}' contains incompatible addons.", armor->GetFormID(), armor->GetFullName()));
+			REX::WARN(std::format("Headband: {0}, Slot: {1}, Mouth: {2}.", headband, newSlot, mouth));
 			for (const auto& arma : armor->modelArray)
 			{
 				auto addon = arma.armorAddon;
