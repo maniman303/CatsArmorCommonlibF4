@@ -12,6 +12,140 @@
 namespace HeadgearProcessor
 {
 	std::unordered_set<RE::TESObjectARMA*> addonsToHeadband;
+	std::unordered_set<RE::TESObjectARMA*> excludedAddons;
+
+	void ScanHeadgearAddons(Setup::TypedSetup setup)
+	{
+		excludedAddons.clear();
+
+		auto humanRaceId = FormUtil::GetFormId("Fallout4.esm", 0x00013746);
+        auto humanRace = FormUtil::GetFormAs<RE::TESRace>(humanRaceId);
+        
+        if (humanRace == NULL)
+        {
+            return;
+        }
+
+		auto dataHandler = RE::TESDataHandler::GetSingleton();
+		if (dataHandler == NULL)
+		{
+			return;
+		}
+
+		uint32_t headgearMask = (1 << 0) | (1 << 16) | (1 << 1) | (1 << 28) | (1 << 18) | (1 << 19);
+		uint32_t newMask = 1 << (setup.bipedIndex - 30);
+
+		std::unordered_map<RE::TESObjectARMA*, bool> processableAddons;
+		const auto& armorArray = dataHandler->GetFormArray<RE::TESObjectARMO>();
+    	for (auto* armor : armorArray)
+		{
+			if (armor == NULL)
+			{
+				continue;
+			}
+
+			if ((armor->bipedModelData.bipedObjectSlots & headgearMask) == 0)
+			{
+				continue;
+			}
+
+			if (armor->GetFormRace() != humanRace)
+			{
+				continue;
+			}
+
+			uint8_t combo = 0;
+			uint8_t hairTop = 0;
+			uint8_t headband = 0;
+			uint8_t hairLong = 0;
+			uint8_t newSlot = 0;
+			uint8_t beard = 0;
+			uint8_t mouth = 0;
+
+			for (const auto& arma : armor->modelArray)
+			{
+				auto addon = arma.armorAddon;
+				if (addon == NULL)
+				{
+					continue;
+				}
+
+				if (addon->GetFormRace() != humanRace)
+				{
+					bool skip = true;
+					for (auto race : addon->additionalRaces)
+					{
+						if (race == humanRace)
+						{
+							skip = false;
+						}
+					}
+
+					if (skip)
+					{
+						continue;
+					}
+				}
+
+				auto slots = addon->bipedModelData.bipedObjectSlots;
+				
+				if ((slots & (1 << 0)) && (slots & (1 << 1)))
+				{
+					if ((slots & (1 << 16)) == 0)
+					{
+						combo++;
+					}
+				}
+				else
+				{
+					if (slots & (1 << 0))
+					{
+						hairTop++;
+					}
+					else 
+
+					if (slots & (1 << 1))
+					{
+						hairLong++;
+					}
+					else if (slots & newMask)
+					{
+						newSlot++;
+					}
+				}
+
+				if (slots & (1 << 18))
+				{
+					beard++;
+				}
+				else if (slots & (1 << 19))
+				{
+					mouth++;
+				}
+			}
+
+			if ((combo <= 0 || newSlot <= 0) && (hairTop <= 0 || headband <= 0) && (hairLong <= 0 || newSlot <= 0) && (beard <= 0 || mouth <= 0))
+			{
+				continue;
+			}
+
+			REX::WARN(std::format("Headgear [{0}] contains incompatible addons.", armor->GetFullName()));
+			// REX::WARN(std::format("HairTop: {0}, Neck: {1}, HairLong: {2}, Slot: {3}, Beard: {4}, Mouth: {5}.", hairTop, neck, hairLong, newSlot, beard, mouth));
+			for (const auto& arma : armor->modelArray)
+			{
+				auto addon = arma.armorAddon;
+				if (addon == NULL)
+				{
+					continue;
+				}
+
+				if (!excludedAddons.contains(addon))
+				{
+					excludedAddons.emplace(addon);
+				}
+			}
+		}
+	}
 
 	int CountUniqueAddons(RE::TESObjectARMO* armor, uint16_t index, uint32_t slot = 0)
 	{
@@ -528,6 +662,13 @@ namespace HeadgearProcessor
 			return;
 		}
 
+		ScanHeadgearAddons(setup);
+
+		// New way:
+		// 1. Process entries from jsons, if entry has excluded addon - skip
+		// 2. Cache modified armors and addons
+		// 3. Go through all game entries again, if not modified and has modified addons - add slots
+
 		auto headgearFiles = Files::GetPluginFiles("Armor");
 		for (auto& entry : headgearFiles)
 		{
@@ -537,5 +678,7 @@ namespace HeadgearProcessor
 		ProcessAddonsToHeadband();
 
 		ProcessHairOnlyHeadgear(setup);
+
+		excludedAddons.clear();
 	}
 }
