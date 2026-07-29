@@ -16,7 +16,7 @@ namespace HeadgearProcessor
 	std::unordered_set<RE::TESObjectARMA*> modifiedAddonsNewSlot;
 	std::unordered_set<RE::TESObjectARMA*> modifiedAddonsMouth;
 
-	void FixUpArmorSlots(const Setup::TypedSetup& setup)
+	void FixUpHairOnlyArmorSlots(const Setup::TypedSetup& setup)
 	{
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
 		if (dataHandler == NULL)
@@ -24,9 +24,10 @@ namespace HeadgearProcessor
 			return;
 		}
 
+		uint32_t hairTopMask = 1 << 0;
+		uint32_t hairLongMask = 1 << 1;
+
 		uint32_t headbandMask = 1 << 16;
-		uint32_t newMask = 1 << (setup.bipedIndex - 30);
-		uint32_t mouthMask = 1 << 19;
 
 		uint32_t count = 0;
 
@@ -44,41 +45,29 @@ namespace HeadgearProcessor
 				continue;
 			}
 
+			if ((armor->formFlags & 4) != 0)
+			{
+				continue;
+			}
+
 			auto armorSlots = armor->bipedModelData.bipedObjectSlots;
-
-			for (const auto& arma : armor->modelArray)
+			if (armorSlots != (hairTopMask | hairLongMask) && armorSlots != hairTopMask && armorSlots != hairLongMask)
 			{
-				auto addon = arma.armorAddon;
-				if (addon == NULL)
-				{
-					continue;
-				}
-
-				if (modifiedAddonsHeadband.contains(addon))
-				{
-					armorSlots |= headbandMask;
-				}
-
-				if (modifiedAddonsNewSlot.contains(addon))
-				{
-					armorSlots |= newMask;
-				}
-
-				if (modifiedAddonsMouth.contains(addon))
-				{
-					armorSlots |= mouthMask;
-				}
+				continue;
 			}
 
-			if (armor->bipedModelData.bipedObjectSlots != armorSlots)
+			if (armor->HasKeyword(setup.keyword))
 			{
-				REX::INFO(std::format("Update armor slots for headgear [0x{0:08X}] '{1}'.", armor->GetFormID(), armor->GetFullName()));
-				armor->bipedModelData.bipedObjectSlots = armorSlots;
-				count++;
+				continue;
 			}
+			
+			armorSlots |= headbandMask;
+			armor->bipedModelData.bipedObjectSlots = armorSlots;
+
+			count++;
 		}
 
-		REX::INFO(std::format("Adjusted slots for {0} headgears.", count));
+		REX::INFO(std::format("Adjusted {0} hair-only headgears.", count));
 
 		auto addonsCount = modifiedAddonsHeadband.size() + modifiedAddonsNewSlot.size() + modifiedAddonsMouth.size();
 		REX::INFO(std::format("Adjusted {0} headgear addons.",  addonsCount));
@@ -624,7 +613,7 @@ namespace HeadgearProcessor
 			ProcessHeadgearEntry(entry);
 		}
 
-		// FixUpArmorSlots(setup);
+		FixUpHairOnlyArmorSlots(setup);
 
 		excludedAddons.clear();
 		modifiedAddonsHeadband.clear();
