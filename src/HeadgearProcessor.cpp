@@ -425,7 +425,7 @@ namespace HeadgearProcessor
 		}
 	}
 
-	bool ValidateHeadgear(RE::TESObjectARMO* armor, const Setup::TypedSetup& setup)
+	bool ValidateHeadgear(RE::TESObjectARMO* armor)
 	{
 		if (armor == NULL)
 		{
@@ -486,7 +486,7 @@ namespace HeadgearProcessor
 		}
 
 		auto armor = form->As<RE::TESObjectARMO>();
-		if (!ValidateHeadgear(armor, setup))
+		if (!ValidateHeadgear(armor))
 		{
 			return;
 		}
