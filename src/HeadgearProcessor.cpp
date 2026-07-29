@@ -72,6 +72,7 @@ namespace HeadgearProcessor
 
 			if (armor->bipedModelData.bipedObjectSlots != armorSlots)
 			{
+				REX::INFO(std::format("Update armor slots for headgear [0x{0:08X}] '{1}'.", armor->GetFormID(), armor->GetFullName()));
 				armor->bipedModelData.bipedObjectSlots = armorSlots;
 				count++;
 			}
@@ -86,14 +87,6 @@ namespace HeadgearProcessor
 	void ScanHeadgearAddons(const Setup::TypedSetup& setup)
 	{
 		excludedAddons.clear();
-
-		// auto humanRaceId = FormUtil::GetFormId("Fallout4.esm", 0x00013746);
-        // auto humanRace = FormUtil::GetFormAs<RE::TESRace>(humanRaceId);
-        
-        // if (humanRace == NULL)
-        // {
-        //     return;
-        // }
 
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
 		if (dataHandler == NULL)
@@ -271,11 +264,13 @@ namespace HeadgearProcessor
 	{
 		std::vector<RE::BGSKeyword*> res;
 
-		uint32_t hairTopMask = 1;
-		uint32_t hairLongMask = 2;
+		uint32_t hairTopMask = 1 << 0;
+		uint32_t hairLongMask = 1 << 1;
 		uint32_t hairBeardMask = 1 << 18;
 
-		// REX::INFO("Processing [{}].", armor->GetFullName());
+		uint32_t headbandMask = 1 << 16;
+		uint32_t newMask = 1 << (setup.bipedIndex - 30);
+		uint32_t mouthMask = 1 << 19;
 
 		auto bipedSlots = armor->bipedModelData.bipedObjectSlots;
 
@@ -297,6 +292,30 @@ namespace HeadgearProcessor
 		bipedSlots = bipedSlots & ~hairTopMask;
 		bipedSlots = bipedSlots & ~hairLongMask;
 		bipedSlots = bipedSlots & ~hairBeardMask;
+
+		for (const auto& arma : armor->modelArray)
+		{
+			auto addon = arma.armorAddon;
+			if (addon == NULL)
+			{
+				continue;
+			}
+
+			if (modifiedAddonsHeadband.contains(addon))
+			{
+				bipedSlots |= headbandMask;
+			}
+
+			if (modifiedAddonsNewSlot.contains(addon))
+			{
+				bipedSlots |= newMask;
+			}
+
+			if (modifiedAddonsMouth.contains(addon))
+			{
+				bipedSlots |= mouthMask;
+			}
+		}
 
 		armor->bipedModelData.bipedObjectSlots = bipedSlots;
 
@@ -351,9 +370,9 @@ namespace HeadgearProcessor
 			}
 
 			auto slots = addon->bipedModelData.bipedObjectSlots;
-			auto modifiedSlots = slots & ~(hairTopMask | hairLongMask | beardMask);
 			if ((armorSlots & slots) != 0)
 			{
+				REX::INFO("Skip addon with reused slots.");
 				continue;
 			}
 
@@ -361,11 +380,13 @@ namespace HeadgearProcessor
 
 			if ((slots & (hairTopMask | hairLongMask | beardMask)) == 0)
 			{
+				REX::INFO("Skip addon without hair.");
 				continue;
 			}
 
 			if (slots & headbandMask)
 			{
+				REX::INFO("Headband current.");
 				if (!modifiedAddonsHeadband.contains(addon))
 				{
 					modifiedAddonsHeadband.emplace(addon);
@@ -373,6 +394,7 @@ namespace HeadgearProcessor
 			}
 			else if (slots & newMask)
 			{
+				REX::INFO("Slot current.");
 				if (!modifiedAddonsNewSlot.contains(addon))
 				{
 					modifiedAddonsNewSlot.emplace(addon);
@@ -380,6 +402,7 @@ namespace HeadgearProcessor
 			}
 			else if (slots & mouthMask)
 			{
+				REX::INFO("Mouth current.");
 				if (!modifiedAddonsMouth.contains(addon))
 				{
 					modifiedAddonsMouth.emplace(addon);
@@ -387,7 +410,8 @@ namespace HeadgearProcessor
 			}
 			else if ((slots & hairTopMask) && (slots & hairLongMask))
 			{
-				modifiedSlots |= newMask;
+				REX::INFO("Combo slot new.");
+				slots |= newMask;
 				if (!modifiedAddonsNewSlot.contains(addon))
 				{
 					modifiedAddonsNewSlot.emplace(addon);
@@ -395,7 +419,8 @@ namespace HeadgearProcessor
 			}
 			else if (slots & hairTopMask)
 			{
-				modifiedSlots |= headbandMask;
+				REX::INFO("Headband new.");
+				slots |= headbandMask;
 				if (!modifiedAddonsHeadband.contains(addon))
 				{
 					modifiedAddonsHeadband.emplace(addon);
@@ -403,7 +428,8 @@ namespace HeadgearProcessor
 			}
 			else if (slots & hairLongMask)
 			{
-				modifiedSlots |= newMask;
+				REX::INFO("Slot new.");
+				slots |= newMask;
 				if (!modifiedAddonsNewSlot.contains(addon))
 				{
 					modifiedAddonsNewSlot.emplace(addon);
@@ -411,16 +437,18 @@ namespace HeadgearProcessor
 			}
 			else if (slots & beardMask)
 			{
-				modifiedSlots |= mouthMask;
+				REX::INFO("Mouth new.");
+				slots |= mouthMask;
 				if (!modifiedAddonsMouth.contains(addon))
 				{
 					modifiedAddonsMouth.emplace(addon);
 				}
 			}
 
-			if (modifiedSlots != slots)
+			if (slots != addon->bipedModelData.bipedObjectSlots)
 			{
-				addon->bipedModelData.bipedObjectSlots = modifiedSlots;
+				REX::INFO("Update addon slots.");
+				addon->bipedModelData.bipedObjectSlots = slots;
 			}
 		}
 	}
@@ -490,6 +518,8 @@ namespace HeadgearProcessor
 		{
 			return;
 		}
+
+		// REX::INFO(std::format("Processing headgear [0x{0:08X}] '{1}'", armor->GetFormID(), armor->GetFullName()));
 
 		ProcessArmorAddons(armor, setup);
 
@@ -588,18 +618,13 @@ namespace HeadgearProcessor
 
 		ScanHeadgearAddons(setup);
 
-		// New way:
-		// 1. Process entries from jsons, if entry has excluded addon - skip
-		// 2. Cache modified armors and addons
-		// 3. Go through all game entries again, if not modified and has modified addons - add slots
-
 		auto headgearFiles = Files::GetPluginFiles("Armor");
 		for (auto& entry : headgearFiles)
 		{
 			ProcessHeadgearEntry(entry);
 		}
 
-		FixUpArmorSlots(setup);
+		// FixUpArmorSlots(setup);
 
 		excludedAddons.clear();
 		modifiedAddonsHeadband.clear();
