@@ -62,12 +62,6 @@ namespace Files
 			return false;
 		}
 
-		indexOpt = dh->GetLoadedModIndex("ArmorKeywords.esm");
-		if (indexOpt.has_value() && indexOpt.value() > 0)
-		{
-			REX::WARN("Mod AWKCR has a well know incompatibility with CATS armor.");
-		}
-
 		return true;
 	}
 
