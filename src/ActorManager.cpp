@@ -23,13 +23,24 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword, con
         return false;
     }
 
+    auto npc = actor->GetNPC();
+
     auto inventoryList = actor->inventoryList;
     if (inventoryList == NULL)
     {
-        auto npc = actor->GetNPC();
         if (npc != NULL)
         {
             REX::WARN(std::format("Inventory for actor [{0}] is NULL.", npc->GetFullName()));
+        }
+
+        return false;
+    }
+
+    if (inventoryList->data.size() <= 0)
+    {
+        if (npc != NULL)
+        {
+            REX::WARN(std::format("Inventory for actor [{0}] is empty.", npc->GetFullName()));
         }
 
         return false;
@@ -281,6 +292,17 @@ static bool IsActorScrapped(RE::Actor* actor)
         {
             // REX::INFO("Actor is unavailable.");
             return true;
+        }
+
+        auto inventoryList = actor->inventoryList;
+        if (inventoryList == NULL)
+        {
+            return true;
+        }
+
+        if (inventoryList->data.size() > 0)
+        {
+            return false;
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
