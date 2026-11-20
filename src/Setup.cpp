@@ -8,8 +8,6 @@
 namespace Setup
 {
 	std::map<int, uint16_t> WorkaroundMap;
-	RE::SpellItem* Spell = NULL;
-	RE::BGSPerk* Perk = NULL;
 	RE::BGSKeyword* ActorKywd = NULL;
 	bool IsInitializedFlag = false;
 
@@ -74,16 +72,6 @@ namespace Setup
 		}
 
 		return TypedSetup();
-	}
-
-	RE::SpellItem* GetSpell()
-	{
-		return Spell;
-	}
-
-	RE::BGSPerk* GetPerk()
-	{
-		return Perk;
 	}
 
 	RE::BGSKeyword* GetActorKeyword()
@@ -172,38 +160,6 @@ namespace Setup
 		}
 
 		SetupMap["headgear"] = TypedSetup(keyword->As<RE::BGSKeyword>(), keywordHidden->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>());
-
-		return true;
-	}
-
-	bool LoadSpellAndPerk(Json::Value setup)
-	{
-		Spell = NULL;
-		Perk = NULL;
-
-		auto magicSetup = setup["magic"];
-
-		if (magicSetup.empty()) {
-			REX::WARN("Magic setup is missing.");
-			return false;
-		}
-
-		auto spellId = FormUtil::GetFormIdFromJson(magicSetup["spell"]);
-		auto spell = FormUtil::GetFormAs<RE::SpellItem>(spellId);
-		if (spell == NULL) {
-			REX::WARN("Magic setup is missing spell.");
-			return false;
-		}
-
-		auto perkId = FormUtil::GetFormIdFromJson(magicSetup["perk"]);
-		auto perk = FormUtil::GetFormAs<RE::BGSPerk>(perkId);
-		if (perk == NULL) {
-			REX::WARN("Magic setup is missing perk.");
-			return false;
-		}
-
-		Spell = spell->As<RE::SpellItem>();
-		Perk = perk->As<RE::BGSPerk>();
 
 		return true;
 	}
@@ -330,12 +286,6 @@ namespace Setup
 				REX::WARN(std::format("Invalid setup for [{0}].", key));
 				result = false;
 			}
-		}
-
-		if (!LoadSpellAndPerk(setupJson))
-		{
-			REX::WARN("Missing setup for spell and perk.");
-			result = false;
 		}
 
 		if (!LoadActorKeyword(setupJson))

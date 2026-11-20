@@ -18,20 +18,6 @@ Keyword Property RightArmKey Auto Const
 Keyword Property LeftLegKey Auto Const
 Keyword Property RightLegKey Auto Const
 
-Keyword Property HairLongKey Auto Const
-Keyword Property HairTopKey Auto Const
-Keyword Property HairBeardKey Auto Const
-
-Armor Property HairLong Auto Const
-Armor Property HairTop Auto Const
-Armor Property HairBeard Auto Const
-
-Spell Property HeadgearAbility Auto Const
-
-Perk Property HeadgearPerk Auto Const
-
-Keyword Property ActorProcessing Auto Const
-
 Event OnQuestInit()
 	TryToGiveItems()
 EndEvent
@@ -42,10 +28,6 @@ EndEvent
 
 Function TryToGiveItems()
 	Actor player = Game.GetPlayer()
-
-	if (!player.HasPerk(HeadgearPerk))
-		player.AddPerk(HeadgearPerk)
-	endif
 
 	Worldspace playerWorldspace = player.GetWorldspace()
 	if (playerWorldspace == PrewarWorldspace || PlayerWorldspace == None)
@@ -179,94 +161,4 @@ Form Function GetEquippedArmor(int index)
 	endIf
 	
 	return item.Item
-EndFunction
-
-bool Function ValidateHeadgearHair(Actor akTarget, bool checkAbility = true)
-    if (akTarget == NONE)
-        return false
-    endif
-
-	bool res = false
-    bool isHidden = akTarget.WornHasKeyword(HeadgearHiddenKey)
-
-    ;CATS:ScriptExtender.Trace("Running headgear effect on: " + akTarget.GetDisplayName())
-	;CATS:ScriptExtender.Trace("[" + akTarget.GetDisplayName() + "] IsHidden: " + isHidden)
-
-    if (akTarget.WornHasKeyword(HairLongKey) && !isHidden)
-		res = res || !akTarget.IsEquipped(HairLong)
-        akTarget.EquipItem(HairLong, abPreventRemoval = true, abSilent = true)
-    else
-		res = res || akTarget.IsEquipped(HairLong)
-        akTarget.UnequipItem(HairLong, abSilent = true)
-    endif
-
-    if (akTarget.WornHasKeyword(HairTopKey) && !isHidden)
-		res = res || !akTarget.IsEquipped(HairTop)
-        akTarget.EquipItem(HairTop, abPreventRemoval = true, abSilent = true)
-    else
-		res = res || akTarget.IsEquipped(HairTop)
-        akTarget.UnequipItem(HairTop, abSilent = true)
-    endif
-
-    if (akTarget.WornHasKeyword(HairBeardKey) && !isHidden)
-		res = res || !akTarget.IsEquipped(HairBeard)
-        akTarget.EquipItem(HairBeard, abPreventRemoval = true, abSilent = true)
-    else
-		res = res || akTarget.IsEquipped(HairBeard)
-        akTarget.UnequipItem(HairBeard, abSilent = true)
-    endif
-
-    if (checkAbility && HeadgearAbility != NONE && akTarget.HasSpell(HeadgearAbility))
-        ; CATS:ScriptExtender.Trace("Removing one shot ability.")
-        akTarget.RemoveSpell(HeadgearAbility)
-    endif
-	
-	return res
-EndFunction
-
-Actor Function GetValidActor(ObjectReference aTarget)
-	if (aTarget == None || !(aTarget is Actor))
-		return None
-	endIf
-	
-	Actor npc = aTarget as Actor
-	if (npc.IsDeleted() || npc.IsDisabled())
-		return None
-	endIf
-	
-	return npc
-EndFunction
-
-Function UpdateHeadgearOfNearbyActors()
-	Actor Player = Game.GetPlayer()
-	
-	if (Player.HasKeyword(ActorProcessing))
-		Player.RemoveKeyword(ActorProcessing)
-		Utility.WaitMenuMode(1.5)
-		ValidateHeadgearHair(Player, false)
-		Player.QueueUpdate(true, 0xC)
-		
-		CATS:ScriptExtender.Trace("Player updated.")
-	endif
-	
-	ObjectReference[] kActors = Player.FindAllReferencesWithKeyword(ActorProcessing, 450)
-	
-	int actorsLength = kActors.length
-	
-	;CATS:ScriptExtender.Trace("Found " + actorsLength + " actors")
-	
-	int i = 0
-	while i < actorsLength
-		Actor npc = GetValidActor(kActors[i])
-		if (npc != None)
-			npc.RemoveKeyword(ActorProcessing)
-			
-			if (ValidateHeadgearHair(npc, false))
-				npc.QueueUpdate(true, 0xC)
-				CATS:ScriptExtender.Trace("Update appearance of [" + npc.GetDisplayName() + "].")
-			endif
-		endif
-		
-		i = i + 1
-	endwhile
 EndFunction

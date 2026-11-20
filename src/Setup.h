@@ -29,10 +29,6 @@ namespace Setup
 
 	TypedSetup GetForms(std::string type);
 
-	RE::SpellItem* GetSpell();
-
-	RE::BGSPerk* GetPerk();
-
 	RE::BGSKeyword* GetActorKeyword();
 
 	bool LoadTypedSetup(Json::Value setup, std::string type);
