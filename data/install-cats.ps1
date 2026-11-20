@@ -3,19 +3,20 @@
   Create symlinks for Cats Armor files into a Fallout 4 Data folder.
   Requires admin privileges unless Developer Mode is enabled.
 
-.PARAMETER TargetPath
-  Destination Data folder, e.g. "D:\SteamLibrary\steamapps\common\Fallout 4\Data"
+.PARAMETER GamePath
+  Fallout 4 root directory (the one containing Fallout4.exe),
+  e.g. "D:\SteamLibrary\steamapps\common\Fallout 4"
 
 .EXAMPLE
-  .\install-cats.ps1 -TargetPath 'D:\SteamLibrary\steamapps\common\Fallout 4\Data'
+  .\install-cats.ps1 -GamePath 'D:\SteamLibrary\steamapps\common\Fallout 4'
 #>
 
 param(
     [Parameter(Mandatory = $true)]
-    [string]$TargetPath
+    [string]$GamePath
 )
 
-# --- Check if running as admin ---
+# --- Check if running as admin (must be the very first thing) ---
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
     Write-Host "This script must be run as Administrator (or with Developer Mode enabled)." -ForegroundColor Red
@@ -29,20 +30,35 @@ function Is-ReparsePoint($path) {
     return (($it.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
 }
 
-# --- Resolve and validate target path safely ---
+# --- Resolve and validate the game directory ---
 $resolved = $null
 try {
-    $resolved = Resolve-Path -LiteralPath $TargetPath -ErrorAction Stop
+    $resolved = Resolve-Path -LiteralPath $GamePath -ErrorAction Stop
 } catch {
-    Write-Error "Target path does not exist or cannot be resolved: '$TargetPath'. Exiting."
+    Write-Error "Game directory does not exist or cannot be resolved: '$GamePath'. Exiting."
     exit 1
 }
 if (-not $resolved -or -not $resolved.Path) {
-    Write-Error "Target path resolution returned no result. Exiting."
+    Write-Error "Game directory resolution returned no result. Exiting."
     exit 1
 }
-$TargetPath = $resolved.Path.Trim()
-Write-Host "Target path resolved to: $TargetPath"
+$GamePath = $resolved.Path.Trim()
+Write-Host "Fallout 4 directory: $GamePath"
+
+# Validate that Fallout4.exe lives in the provided directory
+$exePath = Join-Path $GamePath 'Fallout4.exe'
+if (-not (Test-Path -LiteralPath $exePath -PathType Leaf)) {
+    Write-Error "Fallout4.exe was not found in '$GamePath'. This does not look like a Fallout 4 directory. Exiting."
+    exit 2
+}
+
+# Derive the Data subdirectory and use it as the destination
+$DataPath = Join-Path $GamePath 'Data'
+if (-not (Test-Path -LiteralPath $DataPath -PathType Container)) {
+    Write-Error "Data subdirectory was not found: '$DataPath'. Exiting."
+    exit 3
+}
+Write-Host "Fallout 4 Data directory: $DataPath"
 
 # Script directory
 $ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
@@ -53,8 +69,8 @@ $srcMeshes = Join-Path $ScriptDir 'meshes\armor\CatsArmor'
 $srcScripts = Join-Path $ScriptDir 'scripts\source\user\CATS'
 
 # Destination items
-$dstMeshes = Join-Path $TargetPath 'meshes\armor\CatsArmor'
-$dstScripts = Join-Path $TargetPath 'scripts\source\user\CATS'
+$dstMeshes = Join-Path $DataPath 'meshes\armor\CatsArmor'
+$dstScripts = Join-Path $DataPath 'scripts\source\user\CATS'
 
 Write-Host "Will create symlinks:"
 Write-Host "  Meshes:  $dstMeshes -> $srcMeshes"
@@ -63,11 +79,11 @@ Write-Host "  Scripts: $dstScripts -> $srcScripts"
 # Validate sources
 if (-not (Test-Path -LiteralPath $srcMeshes -PathType Container)) {
     Write-Error "Source meshes folder not found: $srcMeshes. Exiting."
-    exit 3
+    exit 4
 }
 if (-not (Test-Path -LiteralPath $srcScripts -PathType Container)) {
     Write-Error "Source scripts folder not found: $srcScripts. Exiting."
-    exit 4
+    exit 5
 }
 
 # Helper to backup or remove existing destination
