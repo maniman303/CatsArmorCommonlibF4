@@ -17,6 +17,11 @@ namespace HairHooks
 	// is rendered; it receives the actor, so the decision can read the equipped
 	// item for the slot from a_actor->biped->object[slot].parent.object.
 	//
+	// FUN_140360540 is a second, independent hide path: the biped pass
+	// (FUN_14035E3B0) calls it to hide the hair/beard slots that share the worn
+	// headgear's ARMA. HeadPartHide intercepts it so ShouldHide stays the single
+	// source of truth.
+	//
 	// No editor IDs or node names are used anywhere.
 	struct HeadPartVisibility
 	{
@@ -29,6 +34,11 @@ namespace HairHooks
 		static inline REL::THook HookBeard{ REL::Offset{ 0x506863 }, 0, thunk };
 	};
 
-	// Whether the given biped slot's head part should be hidden.
-	bool ShouldHide(RE::Actor* a_actor, std::int32_t a_slot, bool a_engineHide);
+	struct HeadPartHide
+	{
+		static void thunk(RE::NiAVObject* a_face, std::int32_t** a_slot);
+
+		// FUN_140360540 call inside FUN_14035E3B0.
+		static inline REL::THook Hook{ REL::Offset{ 0x35E796 }, 0, thunk };
+	};
 }
