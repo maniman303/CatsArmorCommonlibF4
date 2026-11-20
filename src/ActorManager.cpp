@@ -40,7 +40,7 @@ bool ActorManager::WornHasKeyword(RE::Actor* actor, RE::BGSKeyword* keyword, con
     {
         if (npc != NULL)
         {
-            REX::WARN(std::format("Inventory for actor [{0}] is empty.", npc->GetFullName()));
+            // REX::WARN(std::format("Inventory for actor [{0}] is empty.", npc->GetFullName()));
         }
 
         return false;

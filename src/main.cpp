@@ -9,7 +9,6 @@
 #include "Files.h"
 #include "PapyrusUtil.h"
 #include "ArmorProcessor.h"
-#include "HeadgearProcessor.h"
 #include "PerkDistributor.h"
 #include "ExclusionManager.h"
 

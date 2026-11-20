@@ -15,19 +15,6 @@ namespace HairHooks
 		std::addressof(HeadPartHide::Hook),
 	};
 
-	bool IsHairSlot(const RE::TESRace* a_race, std::int32_t a_slot)
-	{
-		if (a_race == nullptr) {
-			return false;
-		}
-
-		const auto hair = std::to_underlying(a_race->data.hairObject);
-
-		return a_slot == hair ||
-		       a_slot == hair + 1 ||
-		       a_slot == std::to_underlying(a_race->data.beardObject);
-	}
-
 	const char* GetSlotName(const RE::TESRace* a_race, std::int32_t a_slot)
 	{
 		if (a_race == nullptr) {
@@ -143,7 +130,7 @@ namespace HairHooks
 		}
 
 		const bool hide = ShouldHide(actor, a_slot, a_hide);
-		LogSlot(actor, a_slot, hide);
+		// LogSlot(actor, a_slot, hide);
 
 		// Both detour calls to the same function, so HookHair's trampoline
 		// reaches the original regardless of which site invoked us.
@@ -155,22 +142,31 @@ namespace HairHooks
 		auto* actor = GetNodeActor(a_face);
 
 		if (actor == nullptr || a_slot == nullptr || *a_slot == nullptr) {
+			REX::INFO(std::format(
+				"HairSlot: [hide allowed] actor={} slot ptr={} slot={}",
+				actor != nullptr,
+				a_slot != nullptr,
+				a_slot != nullptr && *a_slot != nullptr));
 			Hook(a_face, a_slot);
 			return;
 		}
 
 		const std::int32_t slot = **a_slot;
-		const auto*       npc = actor->GetNPC();
-		const auto*       race = npc != nullptr ? npc->GetFormRace() : nullptr;
 
-		if (IsHairSlot(race, slot) && !ShouldHide(actor, slot, true)) {
+		if (!ShouldHide(actor, slot, true)) {
 			REX::INFO(std::format(
-				"HairSlot: [hide blocked] slot={} ({}) actor=[0x{:08X}]",
+				"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
 				slot,
-				GetSlotName(race, slot),
-				actor->GetFormID()));
+				actor->GetFormID(),
+				actor->GetDisplayFullName()));
 			return;
 		}
+
+		REX::INFO(std::format(
+			"HairSlot: [hide allowed] slot={} actor=[0x{:08X}] [{}]",
+			slot,
+			actor->GetFormID(),
+			actor->GetDisplayFullName()));
 
 		Hook(a_face, a_slot);
 	}
