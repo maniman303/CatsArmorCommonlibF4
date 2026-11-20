@@ -33,8 +33,7 @@ namespace Setup
 		return 0;
 	}
 
-	TypedSetup::TypedSetup(int bi, RE::BGSKeyword* kw, RE::BGSKeyword* kwH, RE::BGSKeyword* as, RE::TESObjectARMA* aa,
-		RE::BGSKeyword* kwHl, RE::BGSKeyword* kwHt, RE::BGSKeyword* kwHb, RE::TESObjectARMO* aHl, RE::TESObjectARMO* aHt, RE::TESObjectARMO* aHb)
+	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* kwH, RE::BGSKeyword* as, RE::TESObjectARMA* aa)
 	{
 		keyword = kw;
 		keywordHidden = kwH;
@@ -42,13 +41,6 @@ namespace Setup
 		armorAddon = aa;
 		isEmpty = false;
 		isEnabled = true;
-		bipedIndex = bi,
-		keywordHairLong = kwHl;
-		keywordHairTop = kwHt;
-		keywordHairBeard = kwHb;
-		armorHairLong = aHl;
-		armorHairTop = aHt;
-		armorHairBeard = aHb;
 	}
 
 	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa)
@@ -59,13 +51,6 @@ namespace Setup
 		armorAddon = aa;
 		isEmpty = false;
 		isEnabled = true;
-		bipedIndex = DefaultBipedIndex;
-		keywordHairLong = NULL;
-		keywordHairTop = NULL;
-		keywordHairBeard = NULL;
-		armorHairLong = NULL;
-		armorHairTop = NULL;
-		armorHairBeard = NULL;
 	}
 
 	TypedSetup::TypedSetup()
@@ -76,13 +61,6 @@ namespace Setup
 		armorAddon = NULL;
 		isEmpty = true;
 		isEnabled = false;
-		bipedIndex = DefaultBipedIndex;
-		keywordHairLong = NULL;
-		keywordHairTop = NULL;
-		keywordHairBeard = NULL;
-		armorHairLong = NULL;
-		armorHairTop = NULL;
-		armorHairBeard = NULL;
 	}
 
 	std::map<std::string, TypedSetup> SetupMap;
@@ -165,14 +143,6 @@ namespace Setup
 			return false;
 		}
 
-		int bipedIndex = DefaultBipedIndex;
-		auto bipedIndexSetup = typedSetup["bipedIndex"];
-		if (!bipedIndexSetup.empty() && bipedIndexSetup.isInt())
-		{
-			bipedIndex = bipedIndexSetup.asInt();
-			REX::WARN(std::format("Custom biped index set to: {}.", bipedIndex));
-		}
-
 		auto keywordId = FormUtil::GetFormIdFromJson(typedSetup["keywordToAdd"]);
 		auto keyword = FormUtil::GetFormAs<RE::BGSKeyword>(keywordId);
 		if (keyword == NULL)
@@ -201,51 +171,7 @@ namespace Setup
 			return false;
 		}
 
-		auto keywordHairLongId = FormUtil::GetFormIdFromJson(typedSetup["keywordHairLong"]);
-		auto keywordHairLong = FormUtil::GetFormAs<RE::BGSKeyword>(keywordHairLongId);
-		if (keywordHairLong == NULL)
-		{
-			return false;
-		}
-
-		auto keywordHairTopId = FormUtil::GetFormIdFromJson(typedSetup["keywordHairTop"]);
-		auto keywordHairTop = FormUtil::GetFormAs<RE::BGSKeyword>(keywordHairTopId);
-		if (keywordHairTop == NULL)
-		{
-			return false;
-		}
-
-		auto keywordHairBeardId = FormUtil::GetFormIdFromJson(typedSetup["keywordHairBeard"]);
-		auto keywordHairBeard = FormUtil::GetFormAs<RE::BGSKeyword>(keywordHairBeardId);
-		if (keywordHairBeard == NULL)
-		{
-			return false;
-		}
-
-		auto armorHairLongId = FormUtil::GetFormIdFromJson(typedSetup["armorHairLong"]);
-		auto armorHairLong = FormUtil::GetFormAs<RE::TESObjectARMO>(armorHairLongId);
-		if (armorHairLong == NULL)
-		{
-			return false;
-		}
-
-		auto armorHairTopId = FormUtil::GetFormIdFromJson(typedSetup["armorHairTop"]);
-		auto armorHairTop = FormUtil::GetFormAs<RE::TESObjectARMO>(armorHairTopId);
-		if (armorHairTop == NULL)
-		{
-			return false;
-		}
-
-		auto armorHairBeardId = FormUtil::GetFormIdFromJson(typedSetup["armorHairBeard"]);
-		auto armorHairBeard = FormUtil::GetFormAs<RE::TESObjectARMO>(armorHairBeardId);
-		if (armorHairBeard == NULL)
-		{
-			return false;
-		}
-
-		SetupMap["headgear"] = TypedSetup(bipedIndex, keyword->As<RE::BGSKeyword>(), keywordHidden->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>(),
-			keywordHairLong->As<RE::BGSKeyword>(), keywordHairTop->As<RE::BGSKeyword>(), keywordHairBeard->As<RE::BGSKeyword>(),
-			armorHairLong->As<RE::TESObjectARMO>(), armorHairTop->As<RE::TESObjectARMO>(), armorHairBeard->As<RE::TESObjectARMO>());
+		SetupMap["headgear"] = TypedSetup(keyword->As<RE::BGSKeyword>(), keywordHidden->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>());
 
 		return true;
 	}
