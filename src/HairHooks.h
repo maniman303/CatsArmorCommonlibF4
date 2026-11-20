@@ -22,6 +22,10 @@ namespace HairHooks
 	// headgear's ARMA. HeadPartHide intercepts it so ShouldHide stays the single
 	// source of truth.
 	//
+	// FUN_14064E570 is a third path for a head part's extraParts (hairline,
+	// etc.); it takes a { face node, slot, hide } context by pointer, so
+	// HeadPartExtra rewrites the hide flag in place before the original runs.
+	//
 	// No editor IDs or node names are used anywhere.
 	struct HeadPartVisibility
 	{
@@ -40,5 +44,29 @@ namespace HairHooks
 
 		// FUN_140360540 call inside FUN_14035E3B0.
 		static inline REL::THook Hook{ REL::Offset{ 0x35E796 }, 0, thunk };
+	};
+
+	// Context FUN_14064E570 takes by pointer: the face node, the biped slot and
+	// the hide flag it applies to the extra part's subsegments.
+	struct HeadPartContext
+	{
+		RE::NiAVObject* face;   // 00
+		std::int32_t    slot;   // 08
+		bool            hide;   // 0C
+	};
+	static_assert(sizeof(HeadPartContext) == 0x10);
+	static_assert(offsetof(HeadPartContext, face) == 0x00);
+	static_assert(offsetof(HeadPartContext, slot) == 0x08);
+	static_assert(offsetof(HeadPartContext, hide) == 0x0C);
+
+	struct HeadPartExtra
+	{
+		static std::uintptr_t thunk(HeadPartContext* a_ctx, void* a_extraPart);
+
+		// The three FUN_14064E570 calls inside FUN_140506460: the extra parts
+		// (hairline, ...) of hair, hair long and beard.
+		static inline REL::THook HookHair{ REL::Offset{ 0x506768 }, 0, thunk };
+		static inline REL::THook HookHairLong{ REL::Offset{ 0x5067D8 }, 0, thunk };
+		static inline REL::THook HookBeard{ REL::Offset{ 0x506898 }, 0, thunk };
 	};
 }

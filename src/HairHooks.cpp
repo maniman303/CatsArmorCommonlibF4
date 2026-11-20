@@ -13,6 +13,9 @@ namespace HairHooks
 		std::addressof(HeadPartVisibility::HookHairLong),
 		std::addressof(HeadPartVisibility::HookBeard),
 		std::addressof(HeadPartHide::Hook),
+		std::addressof(HeadPartExtra::HookHair),
+		std::addressof(HeadPartExtra::HookHairLong),
+		std::addressof(HeadPartExtra::HookBeard),
 	};
 
 	const char* GetSlotName(const RE::TESRace* a_race, std::int32_t a_slot)
@@ -169,5 +172,22 @@ namespace HairHooks
 			actor->GetDisplayFullName()));
 
 		Hook(a_face, a_slot);
+	}
+
+	std::uintptr_t HeadPartExtra::thunk(HeadPartContext* a_ctx, void* a_extraPart)
+	{
+		if (a_ctx == nullptr) {
+			return HookHair(a_ctx, a_extraPart);
+		}
+
+		auto* actor = GetNodeActor(a_ctx->face);
+		if (actor == nullptr) {
+			return HookHair(a_ctx, a_extraPart);
+		}
+
+		// TODO: Analyze extra part
+		a_ctx->hide = ShouldHide(actor, a_ctx->slot, a_ctx->hide);
+
+		return HookHair(a_ctx, a_extraPart);
 	}
 }
