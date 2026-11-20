@@ -18,47 +18,6 @@ namespace HairHooks
 		std::addressof(HeadPartExtra::HookBeard),
 	};
 
-	const char* GetSlotName(const RE::TESRace* a_race, std::int32_t a_slot)
-	{
-		if (a_race == nullptr) {
-			return "hair";
-		}
-
-		const auto hair = std::to_underlying(a_race->data.hairObject);
-
-		if (a_slot == std::to_underlying(a_race->data.beardObject)) {
-			return "beard";
-		}
-
-		if (a_slot == hair + 1) {
-			return "hair long";
-		}
-
-		return "hair";
-	}
-
-	void LogSlot(RE::Actor* a_actor, std::int32_t a_slot, bool a_hide)
-	{
-		if (a_actor == nullptr || a_slot < 0 || a_slot >= std::to_underlying(RE::BIPED_OBJECT::kEditorTotal)) {
-			return;
-		}
-
-		const auto* npc = a_actor->GetNPC();
-		const auto* race = npc != nullptr ? npc->GetFormRace() : nullptr;
-		const auto* biped = a_actor->biped.get();
-		const auto* item = biped != nullptr ? biped->object[a_slot].parent.object : nullptr;
-		const auto* arma = biped != nullptr ? biped->object[a_slot].armorAddon : nullptr;
-
-		REX::INFO(std::format(
-			"HairSlot: slot={} ({}) state={} actor=[0x{:08X}] item=[0x{:08X}] arma=[0x{:08X}]",
-			a_slot,
-			GetSlotName(race, a_slot),
-			a_hide ? "hidden" : "shown",
-			a_actor->GetFormID(),
-			item != nullptr ? item->GetFormID() : 0,
-			arma != nullptr ? arma->GetFormID() : 0));
-	}
-
 	RE::Actor* GetNodeActor(RE::NiAVObject* a_node)
 	{
 		if (a_node == nullptr) {
@@ -113,11 +72,11 @@ namespace HairHooks
 
 		if (isHelmetKywd == ActorManager::kTrue && isHiddenKywd == ActorManager::kTrue)
 		{
-			REX::INFO(std::format(
-				"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
-				a_slot,
-				a_actor->GetFormID(),
-				a_actor->GetDisplayFullName()));
+			// REX::INFO(std::format(
+			// 	"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
+			// 	a_slot,
+			// 	a_actor->GetFormID(),
+			// 	a_actor->GetDisplayFullName()));
 			return false;
 		}
 
@@ -133,10 +92,7 @@ namespace HairHooks
 		}
 
 		const bool hide = ShouldHide(actor, a_slot, a_hide);
-		// LogSlot(actor, a_slot, hide);
 
-		// Both detour calls to the same function, so HookHair's trampoline
-		// reaches the original regardless of which site invoked us.
 		HookHair(a_node, a_slot, hide);
 	}
 
@@ -145,11 +101,6 @@ namespace HairHooks
 		auto* actor = GetNodeActor(a_face);
 
 		if (actor == nullptr || a_slot == nullptr || *a_slot == nullptr) {
-			REX::INFO(std::format(
-				"HairSlot: [hide allowed] actor={} slot ptr={} slot={}",
-				actor != nullptr,
-				a_slot != nullptr,
-				a_slot != nullptr && *a_slot != nullptr));
 			Hook(a_face, a_slot);
 			return;
 		}
@@ -157,24 +108,47 @@ namespace HairHooks
 		const std::int32_t slot = **a_slot;
 
 		if (!ShouldHide(actor, slot, true)) {
-			REX::INFO(std::format(
-				"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
-				slot,
-				actor->GetFormID(),
-				actor->GetDisplayFullName()));
+			// REX::INFO(std::format(
+			// 	"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
+			// 	slot,
+			// 	actor->GetFormID(),
+			// 	actor->GetDisplayFullName()));
+
 			return;
 		}
-
-		REX::INFO(std::format(
-			"HairSlot: [hide allowed] slot={} actor=[0x{:08X}] [{}]",
-			slot,
-			actor->GetFormID(),
-			actor->GetDisplayFullName()));
 
 		Hook(a_face, a_slot);
 	}
 
-	std::uintptr_t HeadPartExtra::thunk(HeadPartContext* a_ctx, void* a_extraPart)
+	bool IsHairOrBeardExtraPart(RE::Actor* a_actor, RE::BGSHeadPart* a_extraPart)
+	{
+		if (a_actor == nullptr || a_extraPart == nullptr) {
+			return false;
+		}
+
+		const auto* npc = a_actor->GetNPC();
+		if (npc == nullptr) {
+			return false;
+		}
+
+		for (auto* part : npc->GetHeadParts()) {
+			if (part == nullptr ||
+			    (part->type != RE::BGSHeadPart::HeadPartType::kHair &&
+			     part->type != RE::BGSHeadPart::HeadPartType::kFacialHair)) {
+				continue;
+			}
+
+			for (auto* extra : part->extraParts) {
+				if (extra == a_extraPart) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	std::uintptr_t HeadPartExtra::thunk(HeadPartContext* a_ctx, RE::BGSHeadPart* a_extraPart)
 	{
 		if (a_ctx == nullptr) {
 			return HookHair(a_ctx, a_extraPart);
@@ -185,8 +159,9 @@ namespace HairHooks
 			return HookHair(a_ctx, a_extraPart);
 		}
 
-		// TODO: Analyze extra part
-		a_ctx->hide = ShouldHide(actor, a_ctx->slot, a_ctx->hide);
+		if (IsHairOrBeardExtraPart(actor, a_extraPart)) {
+			a_ctx->hide = ShouldHide(actor, a_ctx->slot, a_ctx->hide);
+		}
 
 		return HookHair(a_ctx, a_extraPart);
 	}

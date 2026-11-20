@@ -61,7 +61,7 @@ namespace HairHooks
 
 	struct HeadPartExtra
 	{
-		static std::uintptr_t thunk(HeadPartContext* a_ctx, void* a_extraPart);
+		static std::uintptr_t thunk(HeadPartContext* a_ctx, RE::BGSHeadPart* a_extraPart);
 
 		// The three FUN_14064E570 calls inside FUN_140506460: the extra parts
 		// (hairline, ...) of hair, hair long and beard.
