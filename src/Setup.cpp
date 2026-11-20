@@ -38,7 +38,6 @@ namespace Setup
 		attachSlot = as;
 		armorAddon = aa;
 		isEmpty = false;
-		isEnabled = true;
 	}
 
 	TypedSetup::TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* as, RE::TESObjectARMA* aa)
@@ -48,7 +47,6 @@ namespace Setup
 		attachSlot = as;
 		armorAddon = aa;
 		isEmpty = false;
-		isEnabled = true;
 	}
 
 	TypedSetup::TypedSetup()
@@ -58,7 +56,6 @@ namespace Setup
 		attachSlot = NULL;
 		armorAddon = NULL;
 		isEmpty = true;
-		isEnabled = false;
 	}
 
 	std::map<std::string, TypedSetup> SetupMap;
@@ -95,55 +92,8 @@ namespace Setup
 			return false;
 		}
 
-		auto attachSlotId = FormUtil::GetFormIdFromJson(typedSetup["attachSlotToAdd"]);
-		auto attachSlot = FormUtil::GetFormAs<RE::BGSKeyword>(attachSlotId);
-		if (attachSlot == NULL)
-		{
-			return false;
-		}
-
-		auto armorAddonId = FormUtil::GetFormIdFromJson(typedSetup["armorAddon"]);
-		auto armorAddon = FormUtil::GetFormAs<RE::TESObjectARMA>(armorAddonId);
-		if (armorAddon == NULL)
-		{
-			return false;
-		}
-
-		SetupMap[type] = TypedSetup(keyword->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>());
-
-		return true;
-	}
-
-	bool LoadHeadgearSetup(Json::Value setup)
-	{
-		auto typedSetup = setup["headgear"];
-
-		if (typedSetup.empty() || !typedSetup.isObject())
-		{
-			REX::WARN("Json setup is empty.");
-			return false;
-		}
-
-		auto enabledSetup = typedSetup["enabled"];
-		if (!enabledSetup.empty() && enabledSetup.isBool() && !enabledSetup.asBool())
-		{
-			REX::WARN("Json setup is disabled.");
-			return false;
-		}
-
-		auto keywordId = FormUtil::GetFormIdFromJson(typedSetup["keywordToAdd"]);
-		auto keyword = FormUtil::GetFormAs<RE::BGSKeyword>(keywordId);
-		if (keyword == NULL)
-		{
-			return false;
-		}
-
 		auto keywordHiddenId = FormUtil::GetFormIdFromJson(typedSetup["keywordHidden"]);
 		auto keywordHidden = FormUtil::GetFormAs<RE::BGSKeyword>(keywordHiddenId);
-		if (keywordHidden == NULL)
-		{
-			return false;
-		}
 
 		auto attachSlotId = FormUtil::GetFormIdFromJson(typedSetup["attachSlotToAdd"]);
 		auto attachSlot = FormUtil::GetFormAs<RE::BGSKeyword>(attachSlotId);
@@ -159,7 +109,7 @@ namespace Setup
 			return false;
 		}
 
-		SetupMap["headgear"] = TypedSetup(keyword->As<RE::BGSKeyword>(), keywordHidden->As<RE::BGSKeyword>(), attachSlot->As<RE::BGSKeyword>(), armorAddon->As<RE::TESObjectARMA>());
+		SetupMap[type] = TypedSetup(keyword, keywordHidden, attachSlot, armorAddon);
 
 		return true;
 	}
@@ -266,16 +216,6 @@ namespace Setup
 			}
 			else if (key == "magic")
 			{
-				continue;
-			}
-
-			if (key == "headgear")
-			{
-				if (!LoadHeadgearSetup(setupJson))
-				{
-					REX::WARN("Missing setup for headgear.");
-				}
-
 				continue;
 			}
 

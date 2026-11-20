@@ -14,7 +14,6 @@ namespace Setup
 		RE::BGSKeyword* attachSlot;
 		RE::TESObjectARMA* armorAddon;
 		bool isEmpty;
-		bool isEnabled;
 
 		TypedSetup(RE::BGSKeyword* kw, RE::BGSKeyword* kwH, RE::BGSKeyword* as, RE::TESObjectARMA* aa);
 

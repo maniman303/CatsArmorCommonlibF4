@@ -24,6 +24,11 @@
 		"attachSlotToAdd": "Cats Armor.esl|1E",
 		"armorAddon": "Cats Armor.esl|5"
 	},
+	"eyewear": {
+		"keywordToAdd": "Cats Armor.esl|50",
+		"attachSlotToAdd": "Cats Armor.esl|52",
+		"armorAddon": "Cats Armor.esl|58"
+	},
 	"headgear": {
 		"keywordToAdd": "Cats Armor.esl|13",
 		"keywordHidden": "Cats Armor.esl|19",

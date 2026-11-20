@@ -97,6 +97,22 @@ Function Fragment_Terminal_13(ObjectReference akTerminalRef)
 EndFunction
 ;END FRAGMENT
 
+;BEGIN FRAGMENT Fragment_Terminal_14
+Function Fragment_Terminal_14(ObjectReference akTerminalRef)
+;BEGIN CODE
+(CatsQuest as CATS:CatsQuest).HideArmorPiece(6)
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_Terminal_15
+Function Fragment_Terminal_15(ObjectReference akTerminalRef)
+;BEGIN CODE
+(CatsQuest as CATS:CatsQuest).ShowArmorPiece(6)
+;END CODE
+EndFunction
+;END FRAGMENT
+
 ;END FRAGMENT CODE - Do not edit anything between this and the begin comment
 
 Quest Property CatsQuest Auto Const
