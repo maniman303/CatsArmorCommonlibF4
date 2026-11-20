@@ -1,4 +1,7 @@
 #include "HairHooks.h"
+#include "Files.h"
+#include "Setup.h"
+#include "ActorManager.h"
 
 namespace HairHooks
 {
@@ -88,16 +91,47 @@ namespace HairHooks
 
 	bool ShouldHide(RE::Actor* a_actor, std::int32_t a_slot, bool a_engineHide)
 	{
-		// Default: pass through the engine's own decision.
-		//
-		// To force hair/beard always rendered, return false. To force it hidden,
-		// return true. The equipped item for the slot is available for the
-		// decision as:
-		//     a_actor->biped.get()->object[a_slot].parent.object
-		(void)a_actor;
-		(void)a_slot;
-		(void)a_engineHide;
-		return false;
+		if (a_actor == nullptr) {
+			return a_engineHide;
+		}
+
+		if (a_slot != std::to_underlying(RE::BIPED_OBJECT::kHairTop) &&
+		    a_slot != std::to_underlying(RE::BIPED_OBJECT::kHairLong) &&
+		    a_slot != std::to_underlying(RE::BIPED_OBJECT::kBeard)) {
+			return a_engineHide;
+		}
+
+		if (!Files::IsFilePresent() || !Setup::IsInitialized())
+		{
+			return a_engineHide;
+		}
+
+		auto setup = Setup::GetForms("headgear");
+		if (setup.isEmpty)
+		{
+			return a_engineHide;
+		}
+
+		auto isHelmetKywd = ActorManager::SafeWornHasKeyword(a_actor, setup.keyword);
+		auto isHiddenKywd = ActorManager::SafeWornHasKeyword(a_actor, setup.keywordHidden);
+
+		if (isHelmetKywd == ActorManager::kError || isHiddenKywd == ActorManager::kError)
+		{
+			REX::ERROR("Could not safely check keywords for actor during headgear visibility processing.");
+			return a_engineHide;
+		}
+
+		if (isHelmetKywd == ActorManager::kTrue && isHiddenKywd == ActorManager::kTrue)
+		{
+			REX::INFO(std::format(
+				"HairSlot: [hide blocked] slot={} actor=[0x{:08X}] [{}]",
+				a_slot,
+				a_actor->GetFormID(),
+				a_actor->GetDisplayFullName()));
+			return false;
+		}
+
+		return a_engineHide;
 	}
 
 	void HeadPartVisibility::thunk(RE::NiAVObject* a_node, std::int32_t a_slot, bool a_hide)

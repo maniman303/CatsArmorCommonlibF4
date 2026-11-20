@@ -5,13 +5,12 @@
 #include "FormUtil.h"
 #include "Workaround.h"
 #include "Setup.h"
-#include "Hooks.h"
+#include "HairHooks.h"
 #include "Files.h"
 #include "PapyrusUtil.h"
 #include "ArmorProcessor.h"
 #include "HeadgearProcessor.h"
 #include "PerkDistributor.h"
-#include "ActorEquipManagerListener.h"
 #include "ExclusionManager.h"
 
 bool InitModCore(const F4SE::QueryInterface* a_f4se)
@@ -63,9 +62,6 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 		ExclusionManager::Initialize();
 
 		ArmorProcessor::ProcessArmorFiles();
-		HeadgearProcessor::ProcessHeadgearFiles();
-
-		ActorEquipManagerListener::Register();
 
 		PerkDistributor::ProcessMemoryActors();
 
