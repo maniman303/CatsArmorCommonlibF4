@@ -6,8 +6,6 @@
 
 namespace Setup
 {
-	static int DefaultBipedIndex = 58;
-
 	class TypedSetup
 	{
 	public:
