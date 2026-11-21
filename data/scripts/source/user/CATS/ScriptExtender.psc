@@ -6,6 +6,12 @@ Function Trace(String message) native global
 
 Function Notification(String message) native global
 
+String Function StringReplace(String input, String toFind, String toReplace) native global
+
+String Function GetMessageShortTitle(Message message) native global
+
+String Function GetMessageTitle(Message message) native global
+
 Function AddItemsFormList(FormList fList) global
 	if (fList == None)
 		return

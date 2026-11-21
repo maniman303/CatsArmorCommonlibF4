@@ -24,6 +24,8 @@ Keyword Property LeftLegKey Auto Const
 Keyword Property RightLegKey Auto Const
 Keyword Property EyeKey Auto Const
 
+Message Property TooManyMsg Auto Const
+
 Event OnQuestInit()
 	TryToGiveItems()
 EndEvent
@@ -140,8 +142,8 @@ Function TransformArmorPiece(int modIndex, bool shouldRemove)
 	endIf
 
 	if baseObject == None
-		Debug.Notification("CATS: Selected armor type " + bipedIndex + " is not equipped")
-		CATS:ScriptExtender.Trace("Selected armor type " + bipedIndex + " is not equipped.")
+		Debug.Notification("CATS: Armor type " + bipedIndex + " is not equipped")
+		CATS:ScriptExtender.Trace("Armor type " + bipedIndex + " is not equipped.")
 		return
 	endIf
 	
@@ -156,8 +158,10 @@ Function TransformArmorPiece(int modIndex, bool shouldRemove)
 	int itemCount = player.GetItemCount(baseObject)
 	
 	if itemCount > 1
-		CATS:ScriptExtender.Notification("CATS: You have too many " + baseObject.GetName())
-		CATS:ScriptExtender.Trace("You have too many " + baseObject.GetName() + ".")
+		String text = CATS:ScriptExtender.GetMessageTitle(TooManyMsg)
+		text = CATS:ScriptExtender.StringReplace(text, "{}", baseObject.GetName())
+		CATS:ScriptExtender.Notification(text)
+		CATS:ScriptExtender.Trace(text)
 		return
 	endIf
 
