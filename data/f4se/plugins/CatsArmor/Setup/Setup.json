@@ -1,39 +1,39 @@
 {
 	"torso": {
-		"keywordToAdd": "Cats Armor.esl|E",
-		"attachSlotToAdd": "Cats Armor.esl|1A",
-		"armorAddon": "Cats Armor.esl|6"
+		"keywordToAdd": "Cats Armor.esp|E",
+		"attachSlotToAdd": "Cats Armor.esp|1A",
+		"armorAddon": "Cats Armor.esp|6"
 	},
 	"leftArm": {
-		"keywordToAdd": "Cats Armor.esl|F",
-		"attachSlotToAdd": "Cats Armor.esl|1B",
-		"armorAddon": "Cats Armor.esl|2"
+		"keywordToAdd": "Cats Armor.esp|F",
+		"attachSlotToAdd": "Cats Armor.esp|1B",
+		"armorAddon": "Cats Armor.esp|2"
 	},
 	"rightArm": {
-		"keywordToAdd": "Cats Armor.esl|10",
-		"attachSlotToAdd": "Cats Armor.esl|1C",
-		"armorAddon": "Cats Armor.esl|3"
+		"keywordToAdd": "Cats Armor.esp|10",
+		"attachSlotToAdd": "Cats Armor.esp|1C",
+		"armorAddon": "Cats Armor.esp|3"
 	},
 	"leftLeg": {
-		"keywordToAdd": "Cats Armor.esl|11",
-		"attachSlotToAdd": "Cats Armor.esl|1D",
-		"armorAddon": "Cats Armor.esl|4"
+		"keywordToAdd": "Cats Armor.esp|11",
+		"attachSlotToAdd": "Cats Armor.esp|1D",
+		"armorAddon": "Cats Armor.esp|4"
 	},
 	"rightLeg": {
-		"keywordToAdd": "Cats Armor.esl|12",
-		"attachSlotToAdd": "Cats Armor.esl|1E",
-		"armorAddon": "Cats Armor.esl|5"
+		"keywordToAdd": "Cats Armor.esp|12",
+		"attachSlotToAdd": "Cats Armor.esp|1E",
+		"armorAddon": "Cats Armor.esp|5"
 	},
 	"eyewear": {
-		"keywordToAdd": "Cats Armor.esl|50",
-		"attachSlotToAdd": "Cats Armor.esl|52",
-		"armorAddon": "Cats Armor.esl|58"
+		"keywordToAdd": "Cats Armor.esp|50",
+		"attachSlotToAdd": "Cats Armor.esp|52",
+		"armorAddon": "Cats Armor.esp|58"
 	},
 	"headgear": {
-		"keywordToAdd": "Cats Armor.esl|13",
-		"keywordHidden": "Cats Armor.esl|19",
-		"attachSlotToAdd": "Cats Armor.esl|1F",
-		"armorAddon": "Cats Armor.esl|7"
+		"keywordToAdd": "Cats Armor.esp|13",
+		"keywordHidden": "Cats Armor.esp|19",
+		"attachSlotToAdd": "Cats Armor.esp|1F",
+		"armorAddon": "Cats Armor.esp|7"
 	},
-	"actorProcessing": "Cats Armor.esl|4F"
+	"actorProcessing": "Cats Armor.esp|4F"
 }

@@ -42,7 +42,7 @@ void OnMessage(F4SE::MessagingInterface::Message* message)
 
 		if (!Files::VerifyCatsPlugin())
 		{
-			REX::ERROR("Plugin 'Cats Armor.esl' is missing.");
+			REX::ERROR("Plugin 'Cats Armor.esp' is missing.");
 			return;
 		}
 

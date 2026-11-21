@@ -35,6 +35,8 @@ Event OnPlayerTeleport()
 EndEvent
 
 Function TryToGiveItems()
+	CATS:ScriptExtender.Trace("Quest init.")
+
 	Actor player = Game.GetPlayer()
 
 	Worldspace playerWorldspace = player.GetWorldspace()
@@ -95,6 +97,23 @@ Function TransformHeadgear()
 	TransformArmorPiece(5, player.WornHasKeyword(HeadgearHiddenKey))
 EndFunction
 
+Form Function GetEquippedArmor(int index)
+	Actor player = Game.GetPlayer()
+	Actor:WornItem item = player.GetWornItem(index)
+	
+	if item == None || item.Item == None
+		;CATS:ScriptExtender.Trace("Item is none.")
+		return None
+	endIf
+	
+	if !(item.Item is Armor)
+		;CATS:ScriptExtender.Trace("Item is not armor.")
+		return None
+	endIf
+	
+	return item.Item
+EndFunction
+
 Form Function GetEquippedHeadgear()
 	int[] slots = new int[5]
 	slots[0] = 16
@@ -114,23 +133,6 @@ Form Function GetEquippedHeadgear()
 	; CATS:ScriptExtender.Trace("Found headgear at index: " + slots[index - 1] + ".")
 
 	return item
-EndFunction
-
-Form Function GetEquippedArmor(int index)
-	Actor player = Game.GetPlayer()
-	Actor:WornItem item = player.GetWornItem(index)
-	
-	if item == None || item.Item == None
-		;CATS:ScriptExtender.Trace("Item is none.")
-		return None
-	endIf
-	
-	if !(item.Item is Armor)
-		;CATS:ScriptExtender.Trace("Item is not armor.")
-		return None
-	endIf
-	
-	return item.Item
 EndFunction
 
 Function TransformArmorPiece(int modIndex, bool shouldRemove)
