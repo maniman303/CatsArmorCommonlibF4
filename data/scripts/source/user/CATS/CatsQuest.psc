@@ -40,7 +40,7 @@ Function TryToGiveItems()
 	Actor player = Game.GetPlayer()
 
 	Worldspace playerWorldspace = player.GetWorldspace()
-	if (playerWorldspace == PrewarWorldspace || PlayerWorldspace == None)
+	if (playerWorldspace == PrewarWorldspace || PlayerWorldspace == None) && player.GetLevel() < 3
 		; CATS:ScriptExtender.Trace("Registered player teleport.")
 		RegisterForPlayerTeleport()
 	else
